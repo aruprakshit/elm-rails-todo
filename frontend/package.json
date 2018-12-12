@@ -1,0 +1,20 @@
+{
+  "name": "frontend",
+  "version": "1.0.0",
+  "description": "https://www.w3schools.com/howto/howto_js_todolist.asp",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "client": "elm-live ./src/Main.elm --open --dir=public --pushstate --path-to-elm=node_modules/.bin/elm -- --output=public/app.js",
+    "elm-in": "elm install",
+    "repl": "elm repl"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "elm": "^0.19.0-bugfix2",
+    "elm-format": "^0.8.1",
+    "elm-live": "^3.2.3"
+  }
+}
