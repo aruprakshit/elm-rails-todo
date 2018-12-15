@@ -24,7 +24,7 @@ route =
 
 toRoute : String -> Route
 toRoute url =
-    case Url.fromString (Debug.log "URl" url) of
+    case Url.fromString url of
         Nothing ->
             NotFound
 

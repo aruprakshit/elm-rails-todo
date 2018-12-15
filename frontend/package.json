@@ -7,7 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "client": "elm-live ./src/Main.elm --open --dir=public --pushstate --path-to-elm=node_modules/.bin/elm -- --output=public/app.js",
     "elm-in": "elm install",
-    "repl": "elm repl"
+    "repl": "elm repl",
+    "live": "elm-live --help"
   },
   "keywords": [],
   "author": "",
