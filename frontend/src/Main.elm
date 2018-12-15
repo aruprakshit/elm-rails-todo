@@ -139,7 +139,7 @@ pageBody { key, state } =
                     Home.view todos
 
                 NewTodo todo ->
-                    NewTodoPage.view
+                    NewTodoPage.view todo
 
                 _ ->
                     text "Not ready yet"
