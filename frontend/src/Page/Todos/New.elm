@@ -1,8 +1,11 @@
 module Page.Todos.New exposing (view)
 
-import Html exposing (Html, text)
+import Html exposing (Html, form, input, text)
+import Html.Attributes exposing (placeholder, type_)
 
 
 view : Html msg
 view =
-    text "Create new todo"
+    form []
+        [ input [ type_ "text", placeholder "Title" ] []
+        ]

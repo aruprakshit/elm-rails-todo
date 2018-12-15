@@ -1,6 +1,7 @@
 module Page.Home exposing (Todo, initialTodo, view)
 
-import Html exposing (Html, table, tbody, td, text, th, thead, tr)
+import Html exposing (Html, a, div, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (href)
 
 
 type alias Todo =
@@ -17,15 +18,18 @@ initialTodo =
 
 view : List Todo -> Html msg
 view todos =
-    table []
-        [ thead []
-            [ tr []
-                [ th [] [ text "Title" ]
-                , th [] [ text "Content" ]
-                , th [] [ text "Completed?" ]
+    div []
+        [ table []
+            [ thead []
+                [ tr []
+                    [ th [] [ text "Title" ]
+                    , th [] [ text "Content" ]
+                    , th [] [ text "Completed?" ]
+                    ]
                 ]
+            , tbody [] (tableBody todos)
             ]
-        , tbody [] (tableBody todos)
+        , a [ href "todos/new" ] [ text "Create Todo" ]
         ]
 
 

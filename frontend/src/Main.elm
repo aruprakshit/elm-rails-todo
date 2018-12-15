@@ -2,8 +2,7 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
-import Html exposing (Html, a, div, h1, text)
-import Html.Attributes exposing (href)
+import Html exposing (Html, div, h1, text)
 import Http
 import Json.Decode as JD
 import Navigation exposing (Route(..), toRoute)
@@ -29,6 +28,11 @@ type State
     | ShowTodo Todo
 
 
+initialModel : Nav.Key -> Model
+initialModel key =
+    Model key (Home [])
+
+
 
 -- UPDATE
 
@@ -37,6 +41,35 @@ type Msg
     = ChangedUrl Url
     | ActivatedLink Browser.UrlRequest
     | GotTodos (Result Http.Error (List Todo))
+
+
+getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
+getCurrentPageData model url =
+    case toRoute <| Url.toString url of
+        Index ->
+            ( model
+            , fetchTodos
+            )
+
+        New ->
+            ( { model | state = NewTodo initialTodo }
+            , Cmd.none
+            )
+
+        Show todoId ->
+            ( model
+            , Cmd.none
+            )
+
+        Edit todoId ->
+            ( model
+            , Cmd.none
+            )
+
+        NotFound ->
+            ( model
+            , Cmd.none
+            )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -51,31 +84,7 @@ update msg model =
                     ( model, Cmd.none )
 
         ChangedUrl url ->
-            case toRoute <| Url.toString url of
-                Index ->
-                    ( model
-                    , fetchTodos
-                    )
-
-                New ->
-                    ( { model | state = NewTodo initialTodo }
-                    , Cmd.none
-                    )
-
-                Show todoId ->
-                    ( model
-                    , Cmd.none
-                    )
-
-                Edit todoId ->
-                    ( model
-                    , Cmd.none
-                    )
-
-                NotFound ->
-                    ( model
-                    , Cmd.none
-                    )
+            getCurrentPageData model url
 
         GotTodos response ->
             case response of
@@ -92,7 +101,7 @@ update msg model =
 
 init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
-    ( { key = navKey, state = Home [] }, fetchTodos )
+    getCurrentPageData (initialModel navKey) url
 
 
 
@@ -146,7 +155,6 @@ view model =
     { title = pageTitle model.state
     , body =
         [ pageBody model
-        , a [ href "todos/new" ] [ text "Create Todo" ]
         ]
     }
 
