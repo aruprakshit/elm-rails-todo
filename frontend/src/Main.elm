@@ -41,6 +41,7 @@ type Msg
     = ChangedUrl Url
     | ActivatedLink Browser.UrlRequest
     | GotTodos (Result Http.Error (List Todo))
+    | NewTodoPageMsg NewTodoPage.Msg
 
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
@@ -75,6 +76,18 @@ getCurrentPageData model url =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        NewTodoPageMsg formControlMsg ->
+            let
+                oldTodo =
+                    case model.state of
+                        NewTodo todo ->
+                            todo
+
+                newTodo =
+                    NewTodoPage.update formControlMsg oldTodo
+            in
+            ( { model | state = NewTodo newTodo }, Cmd.none )
+
         ActivatedLink urlContainer ->
             case urlContainer of
                 Internal url ->
@@ -139,7 +152,7 @@ pageBody { key, state } =
                     Home.view todos
 
                 NewTodo todo ->
-                    NewTodoPage.view todo
+                    NewTodoPage.view todo |> Html.map NewTodoPageMsg
 
                 _ ->
                     text "Not ready yet"

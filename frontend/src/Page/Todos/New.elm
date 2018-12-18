@@ -1,4 +1,4 @@
-module Page.Todos.New exposing (view)
+module Page.Todos.New exposing (Msg, update, view)
 
 import Html exposing (Html, a, button, div, form, input, label, text, textarea)
 import Html.Attributes exposing (href, placeholder, style, type_, value)
@@ -7,10 +7,28 @@ import Page.Home exposing (Todo)
 
 
 type Msg
-    = OnInputChange String
+    = OnInputChange String String
 
 
-view : Todo -> Html Msg
+type alias Model =
+    Todo
+
+
+update : Msg -> Model -> Model
+update msg model =
+    case msg of
+        OnInputChange name value ->
+            if name == "title" then
+                { model | title = value }
+
+            else if name == "content" then
+                { model | title = value }
+
+            else
+                model
+
+
+view : Model -> Html Msg
 view model =
     div []
         [ form []
@@ -22,7 +40,7 @@ view model =
                         , placeholder "Title"
                         , style "margin-left" "10px"
                         , value model.title
-                        , onInput OnInputChange
+                        , onInput (OnInputChange "title")
                         ]
                         []
                     ]
@@ -34,7 +52,7 @@ view model =
                         [ placeholder "Content"
                         , style "margin-left" "10px"
                         , value (Maybe.withDefault "" model.content)
-                        , onInput OnInputChange
+                        , onInput (OnInputChange "content")
                         ]
                         []
                     ]
