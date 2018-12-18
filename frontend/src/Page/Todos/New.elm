@@ -2,10 +2,15 @@ module Page.Todos.New exposing (view)
 
 import Html exposing (Html, a, button, div, form, input, label, text, textarea)
 import Html.Attributes exposing (href, placeholder, style, type_, value)
+import Html.Events exposing (onInput)
 import Page.Home exposing (Todo)
 
 
-view : Todo -> Html msg
+type Msg
+    = OnInputChange String
+
+
+view : Todo -> Html Msg
 view model =
     div []
         [ form []
@@ -17,6 +22,7 @@ view model =
                         , placeholder "Title"
                         , style "margin-left" "10px"
                         , value model.title
+                        , onInput OnInputChange
                         ]
                         []
                     ]
@@ -28,6 +34,7 @@ view model =
                         [ placeholder "Content"
                         , style "margin-left" "10px"
                         , value (Maybe.withDefault "" model.content)
+                        , onInput OnInputChange
                         ]
                         []
                     ]
