@@ -75,20 +75,15 @@ getCurrentPageData model url =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        NewTodoPageMsg formControlMsg ->
+    case ( msg, model.state ) of
+        ( NewTodoPageMsg formControlMsg, NewTodo oldTodo ) ->
             let
-                oldTodo =
-                    case model.state of
-                        NewTodo todo ->
-                            todo
-
                 newTodo =
                     NewTodoPage.update formControlMsg oldTodo
             in
             ( { model | state = NewTodo newTodo }, Cmd.none )
 
-        ActivatedLink urlContainer ->
+        ( ActivatedLink urlContainer, _ ) ->
             case urlContainer of
                 Internal url ->
                     ( model, Nav.pushUrl model.key url.path )
@@ -96,16 +91,20 @@ update msg model =
                 External path ->
                     ( model, Cmd.none )
 
-        ChangedUrl url ->
+        ( ChangedUrl url, _ ) ->
             getCurrentPageData model url
 
-        GotTodos response ->
+        ( GotTodos response, _ ) ->
             case response of
                 Ok todos ->
                     ( { model | state = Home todos }, Cmd.none )
 
                 Err _ ->
                     ( model, Cmd.none )
+
+        ( _, _ ) ->
+            -- Disregard messages that arrived for the wrong page.
+            ( model, Cmd.none )
 
 
 

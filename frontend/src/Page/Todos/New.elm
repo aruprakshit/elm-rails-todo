@@ -22,7 +22,7 @@ update msg model =
                 { model | title = value }
 
             else if name == "content" then
-                { model | title = value }
+                { model | content = Just value }
 
             else
                 model
