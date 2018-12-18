@@ -80,6 +80,7 @@ update msg model =
         ( NewTodoPageMsg formControlMsg, NewTodo currentTodo ) ->
             NewTodoPage.update formControlMsg currentTodo
                 |> Tuple.mapFirst (\newTodo -> { model | state = NewTodo newTodo })
+                |> Tuple.mapSecond (Cmd.map NewTodoPageMsg)
 
         ( ActivatedLink urlContainer, _ ) ->
             case urlContainer of
