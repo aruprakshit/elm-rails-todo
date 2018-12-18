@@ -2,11 +2,10 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
-import Decoders.Todos exposing (..)
+import Decoders.Todos exposing (todosListDecoder)
 import Html exposing (Html, div, h1, text)
 import Http
 import Json.Decode as JD
-import Json.Encode as JE
 import Navigation exposing (Route(..), toRoute)
 import Page.Home as Home exposing (Todo, initialTodo)
 import Page.Todos.New as NewTodoPage
@@ -44,7 +43,6 @@ type Msg
     | ActivatedLink Browser.UrlRequest
     | GotTodos (Result Http.Error (List Todo))
     | NewTodoPageMsg NewTodoPage.Msg
-    | CreatedTodo (Result Http.Error Todo)
 
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
@@ -79,17 +77,9 @@ getCurrentPageData model url =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.state ) of
-        ( NewTodoPageMsg formControlMsg, NewTodo oldTodo ) ->
-            let
-                newTodo =
-                    NewTodoPage.update formControlMsg oldTodo
-            in
-            case formControlMsg of
-                NewTodoPage.OnInputChange _ _ ->
-                    ( { model | state = NewTodo newTodo }, Cmd.none )
-
-                NewTodoPage.SubmitForm ->
-                    ( model, createTodo newTodo )
+        ( NewTodoPageMsg formControlMsg, NewTodo currentTodo ) ->
+            NewTodoPage.update formControlMsg currentTodo
+                |> Tuple.mapFirst (\newTodo -> { model | state = NewTodo newTodo })
 
         ( ActivatedLink urlContainer, _ ) ->
             case urlContainer of
@@ -109,11 +99,6 @@ update msg model =
 
                 Err _ ->
                     ( model, Cmd.none )
-
-        ( CreatedTodo response, _ ) ->
-            ( model
-            , Nav.pushUrl model.key "/"
-            )
 
         ( _, _ ) ->
             -- Disregard messages that arrived for the wrong page.
@@ -205,21 +190,3 @@ fetchTodos =
         { url = "http://localhost:3000/todos"
         , expect = Http.expectJson GotTodos todosListDecoder
         }
-
-
-createTodo : Todo -> Cmd Msg
-createTodo formData =
-    Http.post
-        { url = "http://localhost:3000/todos"
-        , body = Http.jsonBody <| todoPayload formData
-        , expect = Http.expectJson CreatedTodo todoDecoder
-        }
-
-
-todoPayload : Todo -> JE.Value
-todoPayload formData =
-    JE.object
-        [ ( "title", JE.string formData.title )
-        , ( "content", JE.string (Maybe.withDefault "" formData.content) )
-        , ( "completed", JE.bool formData.completed )
-        ]
