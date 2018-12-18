@@ -13,7 +13,7 @@ type alias Todo =
 
 
 initialTodo =
-    Todo "" (Just "") False Nothing
+    Todo "" Nothing False Nothing
 
 
 view : List Todo -> Html msg

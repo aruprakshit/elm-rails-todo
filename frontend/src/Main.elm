@@ -5,6 +5,7 @@ import Browser.Navigation as Nav
 import Html exposing (Html, div, h1, text)
 import Http
 import Json.Decode as JD
+import Json.Encode as JE
 import Navigation exposing (Route(..), toRoute)
 import Page.Home as Home exposing (Todo, initialTodo)
 import Page.Todos.New as NewTodoPage
@@ -42,6 +43,7 @@ type Msg
     | ActivatedLink Browser.UrlRequest
     | GotTodos (Result Http.Error (List Todo))
     | NewTodoPageMsg NewTodoPage.Msg
+    | CreatedTodo (Result Http.Error Todo)
 
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
@@ -81,7 +83,12 @@ update msg model =
                 newTodo =
                     NewTodoPage.update formControlMsg oldTodo
             in
-            ( { model | state = NewTodo newTodo }, Cmd.none )
+            case formControlMsg of
+                NewTodoPage.OnInputChange _ _ ->
+                    ( { model | state = NewTodo newTodo }, Cmd.none )
+
+                NewTodoPage.SubmitForm ->
+                    ( model, createTodo newTodo )
 
         ( ActivatedLink urlContainer, _ ) ->
             case urlContainer of
@@ -101,6 +108,11 @@ update msg model =
 
                 Err _ ->
                     ( model, Cmd.none )
+
+        ( CreatedTodo response, _ ) ->
+            ( model
+            , Nav.pushUrl model.key "/"
+            )
 
         ( _, _ ) ->
             -- Disregard messages that arrived for the wrong page.
@@ -190,12 +202,30 @@ fetchTodos : Cmd Msg
 fetchTodos =
     Http.get
         { url = "http://localhost:3000/todos"
-        , expect = Http.expectJson GotTodos responseDecoder
+        , expect = Http.expectJson GotTodos todosListDecoder
         }
 
 
-responseDecoder : JD.Decoder (List Todo)
-responseDecoder =
+createTodo : Todo -> Cmd Msg
+createTodo formData =
+    Http.post
+        { url = "http://localhost:3000/todos"
+        , body = Http.jsonBody <| todoPayload formData
+        , expect = Http.expectJson CreatedTodo todoDecoder
+        }
+
+
+todoPayload : Todo -> JE.Value
+todoPayload formData =
+    JE.object
+        [ ( "title", JE.string formData.title )
+        , ( "content", JE.string (Maybe.withDefault "" formData.content) )
+        , ( "completed", JE.bool formData.completed )
+        ]
+
+
+todosListDecoder : JD.Decoder (List Todo)
+todosListDecoder =
     JD.list todoDecoder
 
 

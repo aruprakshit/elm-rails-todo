@@ -1,13 +1,14 @@
-module Page.Todos.New exposing (Msg, update, view)
+module Page.Todos.New exposing (Msg(..), update, view)
 
 import Html exposing (Html, a, button, div, form, input, label, text, textarea)
 import Html.Attributes exposing (href, placeholder, style, type_, value)
-import Html.Events exposing (onInput)
+import Html.Events exposing (onInput, onSubmit)
 import Page.Home exposing (Todo)
 
 
 type Msg
     = OnInputChange String String
+    | SubmitForm
 
 
 type alias Model =
@@ -27,11 +28,14 @@ update msg model =
             else
                 model
 
+        SubmitForm ->
+            model
+
 
 view : Model -> Html Msg
 view model =
     div []
-        [ form []
+        [ form [ onSubmit SubmitForm ]
             [ div [ style "margin-bottom" "10px" ]
                 [ label []
                     [ text "Title:"
