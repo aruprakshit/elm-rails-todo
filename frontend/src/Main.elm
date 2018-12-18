@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
+import Decoders.Todos exposing (..)
 import Html exposing (Html, div, h1, text)
 import Http
 import Json.Decode as JD
@@ -222,17 +223,3 @@ todoPayload formData =
         , ( "content", JE.string (Maybe.withDefault "" formData.content) )
         , ( "completed", JE.bool formData.completed )
         ]
-
-
-todosListDecoder : JD.Decoder (List Todo)
-todosListDecoder =
-    JD.list todoDecoder
-
-
-todoDecoder : JD.Decoder Todo
-todoDecoder =
-    JD.map4 Todo
-        (JD.field "title" JD.string)
-        (JD.field "content" JD.string |> JD.maybe)
-        (JD.field "completed" JD.bool)
-        (JD.field "id" JD.int |> JD.maybe)
