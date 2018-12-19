@@ -72,7 +72,7 @@ view model =
                 [ button [] [ text "Save" ]
                 ]
             ]
-        , a [ href "/" ] [ text "Back" ]
+        , a [ href "/" ] [ text "Back home" ]
         ]
 
 

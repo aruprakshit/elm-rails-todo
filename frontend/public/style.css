@@ -34,3 +34,18 @@ table {
     font-size: .8rem;
     table-layout: fixed;
 }
+
+.links a {
+    text-align: center;
+}
+
+.links {
+    display: flex;
+    width: 140px;
+    justify-content: space-between;
+}
+
+.links .divider {
+    width: 1px;
+    border-right: 1px solid #100101;
+}

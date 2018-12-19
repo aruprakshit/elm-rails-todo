@@ -1,7 +1,7 @@
 module Page.Home exposing (Todo, initialTodo, view)
 
 import Html exposing (Html, a, caption, div, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, colspan, href)
+import Html.Attributes exposing (class, href)
 import Utils.Todo exposing (idToString)
 
 

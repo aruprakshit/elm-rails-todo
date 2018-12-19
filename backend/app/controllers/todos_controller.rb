@@ -10,7 +10,6 @@ class TodosController < ApplicationController
 
   # GET /todos/1
   def show
-    sleep 2
     render json: @todo
   end
 
