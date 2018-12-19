@@ -1,7 +1,8 @@
 module Page.Home exposing (Todo, initialTodo, view)
 
-import Html exposing (Html, a, div, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (href)
+import Html exposing (Html, a, caption, div, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (class, colspan, href)
+import Utils.Todo exposing (idToString)
 
 
 type alias Todo =
@@ -20,11 +21,13 @@ view : List Todo -> Html msg
 view todos =
     div []
         [ table []
-            [ thead []
+            [ caption [] [ text "All Todos" ]
+            , thead []
                 [ tr []
-                    [ th [] [ text "Title" ]
-                    , th [] [ text "Content" ]
-                    , th [] [ text "Completed?" ]
+                    [ th [ class "col" ] [ text "Title" ]
+                    , th [ class "col" ] [ text "Content" ]
+                    , th [ class "col" ] [ text "Completed?" ]
+                    , th [ class "col" ] []
                     ]
                 ]
             , tbody [] (tableBody todos)
@@ -49,6 +52,8 @@ tableBody todos =
                             "˟"
                         )
                     ]
+                , td []
+                    [ a [ href ("todos/" ++ idToString todo.id) ] [ text "Show" ] ]
                 ]
         )
         todos

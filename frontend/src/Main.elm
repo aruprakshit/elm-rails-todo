@@ -2,14 +2,16 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
-import Decoders.Todos exposing (todosListDecoder)
+import Decoders.Todos exposing (todoDecoder, todosListDecoder)
 import Html exposing (Html, div, h1, text)
 import Http
 import Json.Decode as JD
 import Navigation exposing (Route(..), toRoute)
 import Page.Home as Home exposing (Todo, initialTodo)
 import Page.Todos.New as NewTodoPage
+import Page.Todos.Show as ShowTodoPage
 import Url exposing (Url)
+import Utils.Todo exposing (idToString)
 
 
 
@@ -43,6 +45,7 @@ type Msg
     | ActivatedLink Browser.UrlRequest
     | GotTodos (Result Http.Error (List Todo))
     | NewTodoPageMsg NewTodoPage.Msg
+    | GotTodo (Result Http.Error Todo)
 
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
@@ -60,7 +63,7 @@ getCurrentPageData model url =
 
         Show todoId ->
             ( model
-            , Cmd.none
+            , fetchTodo todoId
             )
 
         Edit todoId ->
@@ -92,6 +95,14 @@ update msg model =
 
         ( ChangedUrl url, _ ) ->
             getCurrentPageData model url
+
+        ( GotTodo response, _ ) ->
+            case response of
+                Ok todo ->
+                    ( { model | state = ShowTodo todo }, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
 
         ( GotTodos response, _ ) ->
             case response of
@@ -137,6 +148,9 @@ pageTitle state =
         NewTodo _ ->
             "Create a todo item"
 
+        ShowTodo todo ->
+            todo.title
+
         _ ->
             ""
 
@@ -152,12 +166,14 @@ pageBody { key, state } =
                 NewTodo todo ->
                     NewTodoPage.view todo |> Html.map NewTodoPageMsg
 
+                ShowTodo todo ->
+                    ShowTodoPage.view todo
+
                 _ ->
                     text "Not ready yet"
     in
     div []
-        [ h1 [] [ text <| pageTitle state ]
-        , body
+        [ body
         ]
 
 
@@ -190,4 +206,12 @@ fetchTodos =
     Http.get
         { url = "http://localhost:3000/todos"
         , expect = Http.expectJson GotTodos todosListDecoder
+        }
+
+
+fetchTodo : Int -> Cmd Msg
+fetchTodo todoId =
+    Http.get
+        { url = "http://localhost:3000/todos" ++ String.fromInt todoId
+        , expect = Http.expectJson GotTodo todoDecoder
         }
