@@ -28,7 +28,7 @@ type State
     = NewTodo Todo
     | EditTodo Todo
     | Home (List Todo)
-    | ShowTodo Todo
+    | ShowTodo (Maybe Todo)
 
 
 initialModel : Nav.Key -> Model
@@ -62,7 +62,7 @@ getCurrentPageData model url =
             )
 
         Show todoId ->
-            ( model
+            ( { model | state = ShowTodo Nothing }
             , fetchTodo todoId
             )
 
@@ -99,7 +99,7 @@ update msg model =
         ( GotTodo response, _ ) ->
             case response of
                 Ok todo ->
-                    ( { model | state = ShowTodo todo }, Cmd.none )
+                    ( { model | state = ShowTodo (Just todo) }, Cmd.none )
 
                 Err _ ->
                     ( model, Cmd.none )
@@ -148,8 +148,13 @@ pageTitle state =
         NewTodo _ ->
             "Create a todo item"
 
-        ShowTodo todo ->
-            todo.title
+        ShowTodo maybeTodo ->
+            case maybeTodo of
+                Just todo ->
+                    todo.title
+
+                Nothing ->
+                    "Loading"
 
         _ ->
             ""
@@ -212,6 +217,6 @@ fetchTodos =
 fetchTodo : Int -> Cmd Msg
 fetchTodo todoId =
     Http.get
-        { url = "http://localhost:3000/todos" ++ String.fromInt todoId
+        { url = "http://localhost:3000/todos/" ++ String.fromInt todoId
         , expect = Http.expectJson GotTodo todoDecoder
         }

@@ -18,7 +18,7 @@ route =
         [ map Index top
         , map New (s "todos" </> s "new")
         , map Edit (s "todos" </> s "edit" </> int)
-        , map Show (s "todos" </> s "show" </> int)
+        , map Show (s "todos" </> int)
         ]
 
 

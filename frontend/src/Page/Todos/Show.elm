@@ -6,8 +6,17 @@ import Page.Home exposing (Todo)
 
 
 type alias Model =
-    Todo
+    Maybe Todo
 
 
-view msg model =
-    text "Ongoing"
+view model =
+    let
+        content =
+            case model of
+                Just todo ->
+                    todo.title
+
+                Nothing ->
+                    "Loading"
+    in
+    text content
