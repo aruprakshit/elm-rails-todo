@@ -23,15 +23,14 @@ type alias Model =
 update : Nav.Key -> Msg -> Model -> ( Model, Cmd Msg )
 update key msg model =
     case msg of
-        OnInputChange name value ->
-            if name == "title" then
-                ( { model | title = value }, Cmd.none )
+        OnInputChange "title" value ->
+            ( { model | title = value }, Cmd.none )
 
-            else if name == "content" then
-                ( { model | content = Just value }, Cmd.none )
+        OnInputChange "content" value ->
+            ( { model | content = Just value }, Cmd.none )
 
-            else
-                ( model, Cmd.none )
+        OnInputChange _ _ ->
+            ( model, Cmd.none )
 
         CreateTodo ->
             ( model, createTodo model )
