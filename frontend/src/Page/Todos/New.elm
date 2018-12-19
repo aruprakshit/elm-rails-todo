@@ -20,8 +20,8 @@ type alias Model =
     Todo
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Nav.Key -> Msg -> Model -> ( Model, Cmd Msg )
+update key msg model =
     case msg of
         OnInputChange name value ->
             if name == "title" then
@@ -37,7 +37,7 @@ update msg model =
             ( model, createTodo model )
 
         CreatedTodo response ->
-            ( model, Cmd.none )
+            ( model, Nav.pushUrl key "/" )
 
 
 view : Model -> Html Msg

@@ -78,7 +78,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.state ) of
         ( NewTodoPageMsg formControlMsg, NewTodo currentTodo ) ->
-            NewTodoPage.update formControlMsg currentTodo
+            NewTodoPage.update model.key formControlMsg currentTodo
                 |> Tuple.mapFirst (\newTodo -> { model | state = NewTodo newTodo })
                 |> Tuple.mapSecond (Cmd.map NewTodoPageMsg)
 
