@@ -7,7 +7,7 @@ import Html exposing (Html, div, h1, text)
 import Http
 import Json.Decode as JD
 import Navigation exposing (Route(..), toRoute)
-import Page.Home as Home exposing (Todo, initialTodo)
+import Page.Home as HomePage exposing (Todo, initialTodo)
 import Page.Todos.New as NewTodoPage
 import Page.Todos.Show as ShowTodoPage
 import Url exposing (Url)
@@ -46,6 +46,7 @@ type Msg
     | GotTodos (Result Http.Error (List Todo))
     | NewTodoPageMsg NewTodoPage.Msg
     | GotTodo (Result Http.Error Todo)
+    | HomePageMsg HomePage.Msg
 
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
@@ -80,6 +81,11 @@ getCurrentPageData model url =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.state ) of
+        ( HomePageMsg homeMsg, Home todos ) ->
+            HomePage.update homeMsg todos
+                |> Tuple.mapFirst (\newTodos -> { model | state = Home newTodos })
+                |> Tuple.mapSecond (Cmd.map HomePageMsg)
+
         ( NewTodoPageMsg formControlMsg, NewTodo currentTodo ) ->
             NewTodoPage.update model.key formControlMsg currentTodo
                 |> Tuple.mapFirst (\newTodo -> { model | state = NewTodo newTodo })
@@ -166,7 +172,7 @@ pageBody { key, state } =
         body =
             case state of
                 Home todos ->
-                    Home.view todos
+                    HomePage.view todos |> Html.map HomePageMsg
 
                 NewTodo todo ->
                     NewTodoPage.view todo |> Html.map NewTodoPageMsg
