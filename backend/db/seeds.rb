@@ -5,6 +5,11 @@
 #
 #   movies = Movie.create([{ name: 'Star Wars' }, { name: 'Lord of the Rings' }])
 #   Character.create(name: 'Luke', movie: movies.first)
-Todo.create(title: 'Hit the gym', completed: false)
-Todo.create(title: 'Pay bills', completed: false)
-Todo.create(title: 'Meet George', completed: false)
+
+100.times do |n|
+  Todo.create(
+    title: Faker::Lorem.sentence,
+    content: Faker::Lorem.paragraph,
+    completed: [false, true].sample
+  )
+end
