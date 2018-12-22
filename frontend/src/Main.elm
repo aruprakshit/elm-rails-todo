@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
+import Config exposing (backendDomain)
 import Decoders.Todos exposing (todoDecoder, todosListDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, div, h1, text)
@@ -12,6 +13,7 @@ import Page.Home as HomePage
 import Page.Todos.New as NewTodoPage
 import Page.Todos.Show as ShowTodoPage
 import Url exposing (Url)
+import Url.Builder as UB
 import Utils.Todo exposing (idToString)
 
 
@@ -216,7 +218,7 @@ main =
 fetchTodos : Cmd Msg
 fetchTodos =
     Http.get
-        { url = "http://localhost:3000/todos"
+        { url = backendDomain ++ UB.absolute [ "todos" ] []
         , expect = Http.expectJson GotTodos todosListDecoder
         }
 
@@ -224,6 +226,6 @@ fetchTodos =
 fetchTodo : Int -> Cmd Msg
 fetchTodo todoId =
     Http.get
-        { url = "http://localhost:3000/todos/" ++ String.fromInt todoId
+        { url = backendDomain ++ UB.absolute [ "todos", String.fromInt todoId ] []
         , expect = Http.expectJson GotTodo todoDecoder
         }

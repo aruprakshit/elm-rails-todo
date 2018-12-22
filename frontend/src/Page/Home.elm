@@ -1,5 +1,6 @@
 module Page.Home exposing (Msg(..), update, view)
 
+import Config exposing (backendDomain)
 import Decoders.Todos exposing (todosListDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, caption, div, option, select, table, tbody, td, text, th, thead, tr)
@@ -113,7 +114,7 @@ deleteTodo todoId =
     Http.request
         { method = "DELETE"
         , headers = []
-        , url = "http://localhost:3000/todos/" ++ todoId
+        , url = backendDomain ++ UB.absolute [ "todos", todoId ] []
         , body = Http.emptyBody
         , expect = Http.expectWhatever (Deleted todoId)
         , timeout = Nothing
@@ -125,7 +126,7 @@ searchTodos : String -> Cmd Msg
 searchTodos filterValue =
     Http.post
         { url =
-            "http://localhost:3000"
+            backendDomain
                 ++ UB.absolute [ "todos", "search" ] [ UB.string "q" filterValue ]
         , expect = Http.expectJson SearchResults todosListDecoder
         , body = Http.emptyBody

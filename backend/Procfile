@@ -1,0 +1,2 @@
+backend: bundle exec rails s
+frontend: sh -c 'cd ../frontend/ && npm run client'

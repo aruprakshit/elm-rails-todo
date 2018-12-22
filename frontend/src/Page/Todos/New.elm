@@ -1,6 +1,7 @@
 module Page.Todos.New exposing (Msg(..), update, view)
 
 import Browser.Navigation as Nav
+import Config exposing (backendDomain)
 import Decoders.Todos exposing (todoDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, div, form, input, label, text, textarea)
@@ -8,6 +9,7 @@ import Html.Attributes exposing (href, placeholder, style, type_, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Encode as JE
+import Url.Builder as UB
 
 
 type Msg
@@ -79,7 +81,7 @@ view model =
 createTodo : Model -> Cmd Msg
 createTodo formData =
     Http.post
-        { url = "http://localhost:3000/todos"
+        { url = backendDomain ++ UB.absolute [ "todos" ] []
         , body = Http.jsonBody <| todoPayload formData
         , expect = Http.expectJson CreatedTodo todoDecoder
         }
