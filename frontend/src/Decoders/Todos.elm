@@ -1,17 +1,17 @@
 module Decoders.Todos exposing (todoDecoder, todosListDecoder)
 
+import Entities.Todo as Todo
 import Json.Decode as JD
-import Page.Home exposing (Todo)
 
 
-todosListDecoder : JD.Decoder (List Todo)
+todosListDecoder : JD.Decoder (List Todo.Model)
 todosListDecoder =
     JD.list todoDecoder
 
 
-todoDecoder : JD.Decoder Todo
+todoDecoder : JD.Decoder Todo.Model
 todoDecoder =
-    JD.map4 Todo
+    JD.map4 Todo.Model
         (JD.field "title" JD.string)
         (JD.field "content" JD.string |> JD.maybe)
         (JD.field "completed" JD.bool)

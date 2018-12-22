@@ -1,6 +1,7 @@
-module Page.Home exposing (Msg(..), Todo, initialTodo, update, view)
+module Page.Home exposing (Msg(..), update, view)
 
 import Decoders.Todos exposing (todosListDecoder)
+import Entities.Todo as Todo
 import Html exposing (Html, a, button, caption, div, option, select, table, tbody, td, text, th, thead, tr)
 import Html.Attributes exposing (class, href, type_, value)
 import Html.Events exposing (onClick, onInput)
@@ -9,28 +10,16 @@ import Url.Builder as UB
 import Utils.Todo exposing (idToString)
 
 
-type alias Todo =
-    { title : String
-    , content : Maybe String
-    , completed : Bool
-    , id : Maybe Int
-    }
-
-
-initialTodo =
-    Todo "" Nothing False Nothing
-
-
 type Msg
     = NoOp
     | Delete String
     | Deleted String (Result Http.Error ())
     | ChangeFilter String
-    | SearchResults (Result Http.Error (List Todo))
+    | SearchResults (Result Http.Error (List Model))
 
 
 type alias Model =
-    List Todo
+    List Todo.Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -94,7 +83,7 @@ tableFilter =
         ]
 
 
-tableBody : List Todo -> List (Html Msg)
+tableBody : Model -> List (Html Msg)
 tableBody todos =
     List.map
         (\todo ->
