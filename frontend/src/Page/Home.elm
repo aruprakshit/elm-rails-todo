@@ -134,9 +134,10 @@ deleteTodo todoId =
 
 searchTodos : String -> Cmd Msg
 searchTodos filterValue =
-    Http.get
+    Http.post
         { url =
             "http://localhost:3000"
                 ++ UB.absolute [ "search" ] [ UB.string "q" filterValue ]
         , expect = Http.expectJson SearchResults todosListDecoder
+        , body = Http.emptyBody
         }
