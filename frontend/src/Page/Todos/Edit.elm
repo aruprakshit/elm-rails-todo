@@ -5,8 +5,8 @@ import Config exposing (backendDomain)
 import Decoders.Todos exposing (todoDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, div, form, h1, input, label, text, textarea)
-import Html.Attributes exposing (href, placeholder, style, type_, value)
-import Html.Events exposing (onInput, onSubmit)
+import Html.Attributes exposing (checked, href, placeholder, style, type_, value)
+import Html.Events exposing (onCheck, onInput, onSubmit)
 import Http
 import Json.Encode as JE
 import Url.Builder as UB
@@ -15,6 +15,7 @@ import Utils.Todo exposing (idToString)
 
 type Msg
     = OnInputChange String String
+    | OnCheckChange String Bool
     | UpdateTodo
     | UpdatedTodo (Result Http.Error Model)
 
@@ -32,7 +33,13 @@ update key msg model =
         OnInputChange "content" value ->
             ( { model | content = Just value }, Cmd.none )
 
+        OnCheckChange "completed" value ->
+            ( { model | completed = value }, Cmd.none )
+
         OnInputChange _ _ ->
+            ( model, Cmd.none )
+
+        OnCheckChange _ _ ->
             ( model, Cmd.none )
 
         UpdateTodo ->
@@ -68,6 +75,18 @@ view model =
                         , style "margin-left" "10px"
                         , value (Maybe.withDefault "" model.content)
                         , onInput (OnInputChange "content")
+                        ]
+                        []
+                    ]
+                ]
+            , div [ style "margin-bottom" "10px" ]
+                [ label []
+                    [ text "Completed?"
+                    , input
+                        [ type_ "checkbox"
+                        , style "margin-left" "10px"
+                        , checked model.completed
+                        , onCheck (OnCheckChange "completed")
                         ]
                         []
                     ]
