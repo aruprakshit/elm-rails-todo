@@ -10,6 +10,7 @@ import Http
 import Json.Decode as JD
 import Navigation exposing (Route(..), toRoute)
 import Page.Home as HomePage
+import Page.NotFound as PageNotFound
 import Page.Todos.Edit as EditTodoPage
 import Page.Todos.New as NewTodoPage
 import Page.Todos.Show as ShowTodoPage
@@ -33,6 +34,7 @@ type State
     | EditTodo (Maybe Todo.Model)
     | Home (List Todo.Model)
     | ShowTodo (Maybe Todo.Model)
+    | NoPageFound
 
 
 initialModel : Nav.Key -> Model
@@ -78,7 +80,7 @@ getCurrentPageData model url =
             )
 
         NotFound ->
-            ( model
+            ( { model | state = NoPageFound }
             , Cmd.none
             )
 
@@ -188,6 +190,9 @@ pageTitle state =
                 Nothing ->
                     "Loading"
 
+        NoPageFound ->
+            "Page not found"
+
 
 pageBody : Model -> Html Msg
 pageBody { key, state } =
@@ -210,6 +215,9 @@ pageBody { key, state } =
 
                         Nothing ->
                             text "Loading"
+
+                NoPageFound ->
+                    PageNotFound.view
     in
     div []
         [ body
