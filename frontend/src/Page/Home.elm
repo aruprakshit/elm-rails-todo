@@ -15,7 +15,7 @@ type Msg
     | Delete String
     | Deleted String (Result Http.Error ())
     | ChangeFilter String
-    | SearchResults (Result Http.Error (List Model))
+    | SearchResults (Result Http.Error Model)
 
 
 type alias Model =
@@ -65,7 +65,7 @@ view todos =
                     [ th [ class "col" ] [ text "Title" ]
                     , th [ class "col" ] [ text "Content" ]
                     , th [ class "col" ] [ text "Completed?" ]
-                    , th [ class "col" ] []
+                    , th [ class "col" ] [ tableFilter ]
                     ]
                 ]
             , tbody [] (tableBody todos)
@@ -126,7 +126,7 @@ searchTodos filterValue =
     Http.post
         { url =
             "http://localhost:3000"
-                ++ UB.absolute [ "search" ] [ UB.string "q" filterValue ]
+                ++ UB.absolute [ "todos", "search" ] [ UB.string "q" filterValue ]
         , expect = Http.expectJson SearchResults todosListDecoder
         , body = Http.emptyBody
         }

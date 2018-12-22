@@ -2,22 +2,22 @@ module Page.Todos.New exposing (Msg(..), update, view)
 
 import Browser.Navigation as Nav
 import Decoders.Todos exposing (todoDecoder)
+import Entities.Todo as Todo
 import Html exposing (Html, a, button, div, form, input, label, text, textarea)
 import Html.Attributes exposing (href, placeholder, style, type_, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http
 import Json.Encode as JE
-import Page.Home exposing (Todo)
 
 
 type Msg
     = OnInputChange String String
     | CreateTodo
-    | CreatedTodo (Result Http.Error Todo)
+    | CreatedTodo (Result Http.Error Model)
 
 
 type alias Model =
-    Todo
+    Todo.Model
 
 
 update : Nav.Key -> Msg -> Model -> ( Model, Cmd Msg )

@@ -18,6 +18,8 @@ class TodosController < ApplicationController
       when "3"
         Todo.where(completed: false)
       end
+
+    render json: @todos
   end
 
   # GET /todos/1

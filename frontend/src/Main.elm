@@ -3,11 +3,12 @@ module Main exposing (main)
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
 import Decoders.Todos exposing (todoDecoder, todosListDecoder)
+import Entities.Todo as Todo
 import Html exposing (Html, div, h1, text)
 import Http
 import Json.Decode as JD
 import Navigation exposing (Route(..), toRoute)
-import Page.Home as HomePage exposing (Todo, initialTodo)
+import Page.Home as HomePage
 import Page.Todos.New as NewTodoPage
 import Page.Todos.Show as ShowTodoPage
 import Url exposing (Url)
@@ -25,10 +26,10 @@ type alias Model =
 
 
 type State
-    = NewTodo Todo
-    | EditTodo Todo
-    | Home (List Todo)
-    | ShowTodo (Maybe Todo)
+    = NewTodo Todo.Model
+    | EditTodo Todo.Model
+    | Home (List Todo.Model)
+    | ShowTodo (Maybe Todo.Model)
 
 
 initialModel : Nav.Key -> Model
@@ -43,9 +44,9 @@ initialModel key =
 type Msg
     = ChangedUrl Url
     | ActivatedLink Browser.UrlRequest
-    | GotTodos (Result Http.Error (List Todo))
+    | GotTodos (Result Http.Error (List Todo.Model))
     | NewTodoPageMsg NewTodoPage.Msg
-    | GotTodo (Result Http.Error Todo)
+    | GotTodo (Result Http.Error Todo.Model)
     | HomePageMsg HomePage.Msg
 
 
@@ -58,7 +59,7 @@ getCurrentPageData model url =
             )
 
         New ->
-            ( { model | state = NewTodo initialTodo }
+            ( { model | state = NewTodo Todo.initialModel }
             , Cmd.none
             )
 
