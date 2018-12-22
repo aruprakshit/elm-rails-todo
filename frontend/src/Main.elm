@@ -86,6 +86,11 @@ getCurrentPageData model url =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case ( msg, model.state ) of
+        ( EditTodoPageMsg editMsg, EditTodo todo ) ->
+            EditTodoPage.update model.key editMsg (Maybe.withDefault Todo.initialModel todo)
+                |> Tuple.mapFirst (\newTodo -> { model | state = EditTodo (Just newTodo) })
+                |> Tuple.mapSecond (Cmd.map EditTodoPageMsg)
+
         ( HomePageMsg homeMsg, Home todos ) ->
             HomePage.update homeMsg todos
                 |> Tuple.mapFirst (\newTodos -> { model | state = Home newTodos })

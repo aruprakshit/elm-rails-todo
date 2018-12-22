@@ -36,10 +36,10 @@ update key msg model =
             ( model, Cmd.none )
 
         UpdateTodo ->
-            ( model, createTodo model )
+            ( model, updateTodo model )
 
         UpdatedTodo response ->
-            ( model, Nav.pushUrl key "/" )
+            ( model, Nav.pushUrl key (UB.absolute [ "todos", idToString model.id ] []) )
 
 
 view : Model -> Html Msg
@@ -80,12 +80,16 @@ view model =
         ]
 
 
-createTodo : Model -> Cmd Msg
-createTodo formData =
-    Http.post
-        { url = backendDomain ++ UB.absolute [ "todos" ] []
+updateTodo : Model -> Cmd Msg
+updateTodo formData =
+    Http.request
+        { method = "PUT"
+        , headers = []
+        , url = backendDomain ++ UB.absolute [ "todos", idToString formData.id ] []
         , body = Http.jsonBody <| todoPayload formData
         , expect = Http.expectJson UpdatedTodo todoDecoder
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 
