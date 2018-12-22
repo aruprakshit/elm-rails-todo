@@ -1,9 +1,11 @@
 module Page.Home exposing (Msg(..), Todo, initialTodo, update, view)
 
-import Html exposing (Html, a, button, caption, div, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, href, type_)
-import Html.Events exposing (onClick)
+import Decoders.Todos exposing (todosListDecoder)
+import Html exposing (Html, a, button, caption, div, option, select, table, tbody, td, text, th, thead, tr)
+import Html.Attributes exposing (class, href, type_, value)
+import Html.Events exposing (onClick, onInput)
 import Http
+import Url.Builder as UB
 import Utils.Todo exposing (idToString)
 
 
@@ -23,6 +25,8 @@ type Msg
     = NoOp
     | Delete String
     | Deleted String (Result Http.Error ())
+    | ChangeFilter String
+    | SearchResults (Result Http.Error (List Todo))
 
 
 type alias Model =
@@ -34,6 +38,17 @@ update msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
+
+        ChangeFilter filterValue ->
+            ( model, searchTodos filterValue )
+
+        SearchResults response ->
+            case response of
+                Ok todos ->
+                    ( todos, Cmd.none )
+
+                Err _ ->
+                    ( model, Cmd.none )
 
         Delete todoId ->
             ( model, deleteTodo todoId )
@@ -67,6 +82,15 @@ view todos =
             , tbody [] (tableBody todos)
             ]
         , a [ href "todos/new" ] [ text "Create Todo" ]
+        ]
+
+
+tableFilter : Html Msg
+tableFilter =
+    select [ onInput ChangeFilter ]
+        [ option [ value "1" ] [ text "All" ]
+        , option [ value "2" ] [ text "Completed" ]
+        , option [ value "3" ] [ text "Not Completed" ]
         ]
 
 
@@ -105,4 +129,14 @@ deleteTodo todoId =
         , expect = Http.expectWhatever (Deleted todoId)
         , timeout = Nothing
         , tracker = Nothing
+        }
+
+
+searchTodos : String -> Cmd Msg
+searchTodos filterValue =
+    Http.get
+        { url =
+            "http://localhost:3000"
+                ++ UB.absolute [ "search" ] [ UB.string "q" filterValue ]
+        , expect = Http.expectJson SearchResults todosListDecoder
         }

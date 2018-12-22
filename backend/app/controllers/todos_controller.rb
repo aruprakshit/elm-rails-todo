@@ -8,6 +8,18 @@ class TodosController < ApplicationController
     render json: @todos
   end
 
+  def search
+    @todos = \
+      case params[:q]
+      when "1"
+        Todo.all
+      when "2"
+        Todo.where(completed: true)
+      when "3"
+        Todo.where(completed: false)
+      end
+  end
+
   # GET /todos/1
   def show
     render json: @todo
