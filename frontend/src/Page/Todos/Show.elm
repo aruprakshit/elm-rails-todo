@@ -3,6 +3,7 @@ module Page.Todos.Show exposing (view)
 import Entities.Todo as Todo
 import Html exposing (Html, a, div, h1, p, span, strong, text)
 import Html.Attributes exposing (class, href)
+import Url.Builder as UB
 import Utils.Todo exposing (idToString)
 
 
@@ -41,7 +42,7 @@ todoView todo =
         , div [ class "links" ]
             [ a [ href "/" ] [ text "Back home" ]
             , span [ class "divider" ] []
-            , a [ href ("/todos" ++ idToString todo.id) ] [ text "Edit" ]
+            , a [ href (UB.absolute [ "todos", idToString todo.id, "edit" ] []) ] [ text "Edit" ]
             ]
         ]
 

@@ -10,6 +10,7 @@ import Http
 import Json.Decode as JD
 import Navigation exposing (Route(..), toRoute)
 import Page.Home as HomePage
+import Page.Todos.Edit as EditTodoPage
 import Page.Todos.New as NewTodoPage
 import Page.Todos.Show as ShowTodoPage
 import Url exposing (Url)
@@ -29,7 +30,7 @@ type alias Model =
 
 type State
     = NewTodo Todo.Model
-    | EditTodo Todo.Model
+    | EditTodo (Maybe Todo.Model)
     | Home (List Todo.Model)
     | ShowTodo (Maybe Todo.Model)
 
@@ -50,6 +51,7 @@ type Msg
     | NewTodoPageMsg NewTodoPage.Msg
     | GotTodo (Result Http.Error Todo.Model)
     | HomePageMsg HomePage.Msg
+    | EditTodoPageMsg EditTodoPage.Msg
 
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
@@ -71,8 +73,8 @@ getCurrentPageData model url =
             )
 
         Edit todoId ->
-            ( model
-            , Cmd.none
+            ( { model | state = EditTodo Nothing }
+            , fetchTodo todoId
             )
 
         NotFound ->
@@ -108,7 +110,15 @@ update msg model =
         ( GotTodo response, _ ) ->
             case response of
                 Ok todo ->
-                    ( { model | state = ShowTodo (Just todo) }, Cmd.none )
+                    case model.state of
+                        ShowTodo _ ->
+                            ( { model | state = ShowTodo (Just todo) }, Cmd.none )
+
+                        EditTodo _ ->
+                            ( { model | state = EditTodo (Just todo) }, Cmd.none )
+
+                        _ ->
+                            ( model, Cmd.none )
 
                 Err _ ->
                     ( model, Cmd.none )
@@ -165,8 +175,13 @@ pageTitle state =
                 Nothing ->
                     "Loading"
 
-        _ ->
-            ""
+        EditTodo maybeTodo ->
+            case maybeTodo of
+                Just todo ->
+                    todo.title
+
+                Nothing ->
+                    "Loading"
 
 
 pageBody : Model -> Html Msg
@@ -183,8 +198,13 @@ pageBody { key, state } =
                 ShowTodo todo ->
                     ShowTodoPage.view todo
 
-                _ ->
-                    text "Not ready yet"
+                EditTodo todo ->
+                    case todo of
+                        Just formData ->
+                            EditTodoPage.view formData |> Html.map EditTodoPageMsg
+
+                        Nothing ->
+                            text "Loading"
     in
     div []
         [ body

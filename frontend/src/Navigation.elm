@@ -17,7 +17,7 @@ route =
     oneOf
         [ map Index top
         , map New (s "todos" </> s "new")
-        , map Edit (s "todos" </> s "edit" </> int)
+        , map Edit (s "todos" </> int </> s "edit")
         , map Show (s "todos" </> int)
         ]
 
