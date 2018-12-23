@@ -5,6 +5,7 @@ import Browser.Navigation as Nav
 import Config exposing (backendDomain)
 import Decoders.Todos exposing (todoDecoder, todosListDecoder)
 import Entities.Todo as Todo
+import Entities.User as User
 import Html exposing (Html, div, h1, text)
 import Html.Attributes exposing (class)
 import Http
@@ -37,7 +38,7 @@ type State
     | Home (List Todo.Model)
     | ShowTodo (Maybe Todo.Model)
     | NoPageFound
-    | Session
+    | Session User.Model
 
 
 initialModel : Nav.Key -> Model
@@ -57,6 +58,7 @@ type Msg
     | GotTodo (Result Http.Error Todo.Model)
     | HomePageMsg HomePage.Msg
     | EditTodoPageMsg EditTodoPage.Msg
+    | SessionsPageMsg SessionsPage.Msg
 
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
@@ -83,7 +85,7 @@ getCurrentPageData model url =
             )
 
         Login ->
-            ( { model | state = Session }, Cmd.none )
+            ( { model | state = Session User.initialModel }, Cmd.none )
 
         NotFound ->
             ( { model | state = NoPageFound }
@@ -108,6 +110,11 @@ update msg model =
             NewTodoPage.update model.key formControlMsg currentTodo
                 |> Tuple.mapFirst (\newTodo -> { model | state = NewTodo newTodo })
                 |> Tuple.mapSecond (Cmd.map NewTodoPageMsg)
+
+        ( SessionsPageMsg formControlMsg, Session currentUser ) ->
+            SessionsPage.update model.key formControlMsg currentUser
+                |> Tuple.mapFirst (\user -> { model | state = Session user })
+                |> Tuple.mapSecond (Cmd.map SessionsPageMsg)
 
         ( ActivatedLink urlContainer, _ ) ->
             case urlContainer of
@@ -196,7 +203,7 @@ pageTitle state =
                 Nothing ->
                     "Loading"
 
-        Session ->
+        Session _ ->
             "Log in"
 
         NoPageFound ->
@@ -225,8 +232,8 @@ pageBody { key, state } =
                         Nothing ->
                             text "Loading"
 
-                Session ->
-                    SessionsPage.view
+                Session user ->
+                    SessionsPage.view user |> Html.map SessionsPageMsg
 
                 NoPageFound ->
                     PageNotFound.view
