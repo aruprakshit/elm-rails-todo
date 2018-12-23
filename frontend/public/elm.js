@@ -6480,6 +6480,7 @@ var author$project$Navigation$toRoute = function (url) {
 			A2(elm$url$Url$Parser$parse, author$project$Navigation$route, uri));
 	}
 };
+var elm$core$Debug$log = _Debug_log;
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var elm$url$Url$addPort = F2(
@@ -6529,7 +6530,10 @@ var elm$url$Url$toString = function (url) {
 var author$project$Main$getCurrentPageData = F2(
 	function (model, url) {
 		var _n0 = author$project$Navigation$toRoute(
-			elm$url$Url$toString(url));
+			A2(
+				elm$core$Debug$log,
+				'URL',
+				elm$url$Url$toString(url)));
 		switch (_n0.$) {
 			case 'Index':
 				return _Utils_Tuple2(
@@ -7401,8 +7405,8 @@ var author$project$Main$update = F2(
 		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	});
 var author$project$Main$LogOut = {$: 'LogOut'};
-var elm$core$Debug$log = _Debug_log;
 var elm$html$Html$a = _VirtualDom_node('a');
+var elm$html$Html$button = _VirtualDom_node('button');
 var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$nav = _VirtualDom_node('nav');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
@@ -7439,8 +7443,9 @@ var elm$html$Html$Events$onClick = function (msg) {
 		elm$json$Json$Decode$succeed(msg));
 };
 var author$project$Main$navView = function (model) {
+	var logModel = A2(elm$core$Debug$log, 'Model', model);
 	var isLoggedIn = function () {
-		var _n0 = A2(elm$core$Debug$log, 'Log', model.authState);
+		var _n0 = model.authState;
 		if (_n0.$ === 'Authenticated') {
 			return true;
 		} else {
@@ -7475,11 +7480,10 @@ var author$project$Main$navView = function (model) {
 								elm$html$Html$text('Company Logo')
 							])),
 						isLoggedIn ? A2(
-						elm$html$Html$a,
+						elm$html$Html$button,
 						_List_fromArray(
 							[
 								elm$html$Html$Attributes$class('navbar-brand btn btn-info'),
-								elm$html$Html$Attributes$href('#'),
 								elm$html$Html$Events$onClick(author$project$Main$LogOut)
 							]),
 						_List_fromArray(
@@ -7494,7 +7498,6 @@ var author$project$Page$Auth$Sessions$OnInputChange = F2(
 	function (a, b) {
 		return {$: 'OnInputChange', a: a, b: b};
 	});
-var elm$html$Html$button = _VirtualDom_node('button');
 var elm$html$Html$form = _VirtualDom_node('form');
 var elm$html$Html$input = _VirtualDom_node('input');
 var elm$html$Html$label = _VirtualDom_node('label');

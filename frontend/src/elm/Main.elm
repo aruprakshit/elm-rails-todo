@@ -7,7 +7,7 @@ import Decoders.Flags exposing (decodeFlags)
 import Decoders.Todos exposing (todoDecoder, todosListDecoder)
 import Entities.Signin as Signin
 import Entities.Todo as Todo
-import Html exposing (Html, a, div, h1, nav, text)
+import Html exposing (Html, a, button, div, h1, nav, text)
 import Html.Attributes exposing (class, href)
 import Html.Events exposing (onClick)
 import Http
@@ -69,7 +69,7 @@ type Msg
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
 getCurrentPageData model url =
-    case toRoute <| Url.toString url of
+    case toRoute <| Debug.log "URL" (Url.toString url) of
         Index ->
             ( { model | state = Home [] }
             , fetchTodos model
@@ -206,8 +206,11 @@ subscriptions _ =
 navView : Model -> Html Msg
 navView model =
     let
+        logModel =
+            Debug.log "Model" model
+
         isLoggedIn =
-            case Debug.log "Log" model.authState of
+            case model.authState of
                 Authenticated _ ->
                     True
 
@@ -218,7 +221,7 @@ navView model =
         [ nav [ class "navbar navbar-light bg-light" ]
             [ a [ class "navbar-brand", href "/" ] [ text "Company Logo" ]
             , if isLoggedIn then
-                a [ class "navbar-brand btn btn-info", href "#", onClick LogOut ] [ text "Log out" ]
+                button [ class "navbar-brand btn btn-info", onClick LogOut ] [ text "Log out" ]
 
               else
                 text ""
