@@ -5,4 +5,8 @@ document.addEventListener('DOMContentLoaded', function (event) {
       node: document.getElementById('root'),
       flags: Cookies.get('appAuthToken')
   })
+
+  app.ports.storeAuthInfo.subscribe(function(auth) {
+    Cookies.set('appAuthToken', auth, { expires: 7 });
+  });
 })

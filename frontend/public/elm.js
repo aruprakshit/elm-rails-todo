@@ -4998,18 +4998,21 @@ var author$project$Main$Authenticated = function (a) {
 	return {$: 'Authenticated', a: a};
 };
 var author$project$Main$NotAuthenticated = {$: 'NotAuthenticated'};
+var author$project$Entities$Signin$Model = F2(
+	function (email, password) {
+		return {email: email, password: password};
+	});
+var author$project$Entities$Signin$initialModel = A2(author$project$Entities$Signin$Model, '', '');
 var author$project$Entities$Todo$Model = F4(
 	function (title, content, completed, id) {
 		return {completed: completed, content: content, id: id, title: title};
 	});
 var author$project$Entities$Todo$initialModel = A4(author$project$Entities$Todo$Model, '', elm$core$Maybe$Nothing, false, elm$core$Maybe$Nothing);
-var author$project$Entities$User$Model = F4(
-	function (email, username, password, id) {
-		return {email: email, id: id, password: password, username: username};
-	});
-var author$project$Entities$User$initialModel = A4(author$project$Entities$User$Model, '', '', '', elm$core$Maybe$Nothing);
 var author$project$Main$EditTodo = function (a) {
 	return {$: 'EditTodo', a: a};
+};
+var author$project$Main$Home = function (a) {
+	return {$: 'Home', a: a};
 };
 var author$project$Main$NewTodo = function (a) {
 	return {$: 'NewTodo', a: a};
@@ -5984,17 +5987,41 @@ var author$project$Decoders$Todos$todosListDecoder = elm$json$Json$Decode$list(a
 var author$project$Main$GotTodos = function (a) {
 	return {$: 'GotTodos', a: a};
 };
-var author$project$Main$fetchTodos = elm$http$Http$get(
-	{
-		expect: A2(elm$http$Http$expectJson, author$project$Main$GotTodos, author$project$Decoders$Todos$todosListDecoder),
-		url: _Utils_ap(
-			author$project$Config$backendDomain,
-			A2(
-				elm$url$Url$Builder$absolute,
-				_List_fromArray(
-					['todos']),
-				_List_Nil))
+var elm$http$Http$Header = F2(
+	function (a, b) {
+		return {$: 'Header', a: a, b: b};
 	});
+var elm$http$Http$header = elm$http$Http$Header;
+var author$project$Main$fetchTodos = function (model) {
+	var authToken = function () {
+		var _n0 = model.authState;
+		if (_n0.$ === 'Authenticated') {
+			var token = _n0.a;
+			return token;
+		} else {
+			return '';
+		}
+	}();
+	return elm$http$Http$request(
+		{
+			body: elm$http$Http$emptyBody,
+			expect: A2(elm$http$Http$expectJson, author$project$Main$GotTodos, author$project$Decoders$Todos$todosListDecoder),
+			headers: _List_fromArray(
+				[
+					A2(elm$http$Http$header, 'Authorization', authToken)
+				]),
+			method: 'GET',
+			timeout: elm$core$Maybe$Nothing,
+			tracker: elm$core$Maybe$Nothing,
+			url: _Utils_ap(
+				author$project$Config$backendDomain,
+				A2(
+					elm$url$Url$Builder$absolute,
+					_List_fromArray(
+						['todos']),
+					_List_Nil))
+		});
+};
 var author$project$Navigation$NotFound = {$: 'NotFound'};
 var author$project$Navigation$Edit = function (a) {
 	return {$: 'Edit', a: a};
@@ -6499,7 +6526,13 @@ var author$project$Main$getCurrentPageData = F2(
 			elm$url$Url$toString(url));
 		switch (_n0.$) {
 			case 'Index':
-				return _Utils_Tuple2(model, author$project$Main$fetchTodos);
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{
+							state: author$project$Main$Home(_List_Nil)
+						}),
+					author$project$Main$fetchTodos(model));
 			case 'New':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -6531,7 +6564,7 @@ var author$project$Main$getCurrentPageData = F2(
 					_Utils_update(
 						model,
 						{
-							state: author$project$Main$Session(author$project$Entities$User$initialModel)
+							state: author$project$Main$Session(author$project$Entities$Signin$initialModel)
 						}),
 					elm$core$Platform$Cmd$none);
 			default:
@@ -6551,7 +6584,7 @@ var author$project$Main$initialModel = F2(
 		return A3(
 			author$project$Main$Model,
 			key,
-			author$project$Main$Session(author$project$Entities$User$initialModel),
+			author$project$Main$Session(author$project$Entities$Signin$initialModel),
 			authState);
 	});
 var elm$browser$Browser$External = function (a) {
@@ -6640,9 +6673,13 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	}
 };
 var elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
+var elm$core$Debug$log = _Debug_log;
 var author$project$Main$init = F3(
 	function (flags, url, navKey) {
-		var _n0 = author$project$Decoders$Flags$decodeFlags(flags);
+		var _n0 = A2(
+			elm$core$Debug$log,
+			'Log',
+			author$project$Decoders$Flags$decodeFlags(flags));
 		if (_n0.$ === 'Just') {
 			var authToken = _n0.a;
 			return A2(
@@ -6673,9 +6710,6 @@ var author$project$Main$subscriptions = function (_n0) {
 var author$project$Main$EditTodoPageMsg = function (a) {
 	return {$: 'EditTodoPageMsg', a: a};
 };
-var author$project$Main$Home = function (a) {
-	return {$: 'Home', a: a};
-};
 var author$project$Main$HomePageMsg = function (a) {
 	return {$: 'HomePageMsg', a: a};
 };
@@ -6685,25 +6719,110 @@ var author$project$Main$NewTodoPageMsg = function (a) {
 var author$project$Main$SessionsPageMsg = function (a) {
 	return {$: 'SessionsPageMsg', a: a};
 };
+var author$project$Entities$Signin$AuthInfo = function (authToken) {
+	return {authToken: authToken};
+};
+var author$project$Decoders$Auth$authDecoder = A2(
+	elm$json$Json$Decode$map,
+	author$project$Entities$Signin$AuthInfo,
+	A2(elm$json$Json$Decode$field, 'auth_token', elm$json$Json$Decode$string));
+var author$project$Page$Auth$Sessions$LoginCompleted = function (a) {
+	return {$: 'LoginCompleted', a: a};
+};
+var elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			elm$core$List$foldl,
+			F2(
+				function (_n0, obj) {
+					var k = _n0.a;
+					var v = _n0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var elm$json$Json$Encode$string = _Json_wrap;
+var author$project$Page$Auth$Sessions$loginPayload = function (formData) {
+	return elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'email',
+				elm$json$Json$Encode$string(formData.email)),
+				_Utils_Tuple2(
+				'password',
+				elm$json$Json$Encode$string(formData.password))
+			]));
+};
+var elm$http$Http$jsonBody = function (value) {
+	return A2(
+		_Http_pair,
+		'application/json',
+		A2(elm$json$Json$Encode$encode, 0, value));
+};
+var elm$http$Http$post = function (r) {
+	return elm$http$Http$request(
+		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: elm$core$Maybe$Nothing, tracker: elm$core$Maybe$Nothing, url: r.url});
+};
+var author$project$Page$Auth$Sessions$singIn = function (formData) {
+	return elm$http$Http$post(
+		{
+			body: elm$http$Http$jsonBody(
+				author$project$Page$Auth$Sessions$loginPayload(formData)),
+			expect: A2(elm$http$Http$expectJson, author$project$Page$Auth$Sessions$LoginCompleted, author$project$Decoders$Auth$authDecoder),
+			url: _Utils_ap(
+				author$project$Config$backendDomain,
+				A2(
+					elm$url$Url$Builder$absolute,
+					_List_fromArray(
+						['sessions']),
+					_List_Nil))
+		});
+};
+var author$project$Ports$storeAuthInfo = _Platform_outgoingPort('storeAuthInfo', elm$core$Basics$identity);
 var author$project$Page$Auth$Sessions$update = F3(
 	function (key, msg, model) {
-		switch (msg.a) {
-			case 'email':
-				var value = msg.b;
+		switch (msg.$) {
+			case 'OnInputChange':
+				switch (msg.a) {
+					case 'email':
+						var value = msg.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{email: value}),
+							elm$core$Platform$Cmd$none);
+					case 'password':
+						var value = msg.b;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{password: value}),
+							elm$core$Platform$Cmd$none);
+					default:
+						return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
+			case 'LogInRequested':
 				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{email: value}),
-					elm$core$Platform$Cmd$none);
-			case 'password':
-				var value = msg.b;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{password: value}),
-					elm$core$Platform$Cmd$none);
+					model,
+					author$project$Page$Auth$Sessions$singIn(model));
 			default:
-				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				var response = msg.a;
+				if (response.$ === 'Ok') {
+					var authData = response.a;
+					return _Utils_Tuple2(
+						model,
+						elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[
+									author$project$Ports$storeAuthInfo(
+									elm$json$Json$Encode$string(authData.authToken)),
+									A2(elm$browser$Browser$Navigation$pushUrl, key, '/')
+								])));
+				} else {
+					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+				}
 		}
 	});
 var author$project$Page$Home$Deleted = F2(
@@ -6748,10 +6867,6 @@ var author$project$Page$Home$deleteTodo = function (todoId) {
 };
 var author$project$Page$Home$SearchResults = function (a) {
 	return {$: 'SearchResults', a: a};
-};
-var elm$http$Http$post = function (r) {
-	return elm$http$Http$request(
-		{body: r.body, expect: r.expect, headers: _List_Nil, method: 'POST', timeout: elm$core$Maybe$Nothing, tracker: elm$core$Maybe$Nothing, url: r.url});
 };
 var elm$url$Url$percentEncode = _Url_percentEncode;
 var elm$url$Url$Builder$QueryParameter = F2(
@@ -6843,20 +6958,6 @@ var author$project$Page$Todos$Edit$UpdatedTodo = function (a) {
 	return {$: 'UpdatedTodo', a: a};
 };
 var elm$json$Json$Encode$bool = _Json_wrap;
-var elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			elm$core$List$foldl,
-			F2(
-				function (_n0, obj) {
-					var k = _n0.a;
-					var v = _n0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
-};
-var elm$json$Json$Encode$string = _Json_wrap;
 var author$project$Page$Todos$Edit$todoPayload = function (formData) {
 	return elm$json$Json$Encode$object(
 		_List_fromArray(
@@ -6888,12 +6989,6 @@ var author$project$Utils$Todo$idToString = function (number) {
 		elm$core$Maybe$withDefault,
 		'',
 		A2(elm$core$Maybe$map, elm$core$String$fromInt, number));
-};
-var elm$http$Http$jsonBody = function (value) {
-	return A2(
-		_Http_pair,
-		'application/json',
-		A2(elm$json$Json$Encode$encode, 0, value));
 };
 var author$project$Page$Todos$Edit$updateTodo = function (formData) {
 	return elm$http$Http$request(
@@ -7212,6 +7307,7 @@ var author$project$Main$update = F2(
 		}
 		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	});
+var author$project$Page$Auth$Sessions$LogInRequested = {$: 'LogInRequested'};
 var author$project$Page$Auth$Sessions$OnInputChange = F2(
 	function (a, b) {
 		return {$: 'OnInputChange', a: a, b: b};
@@ -7269,6 +7365,28 @@ var elm$html$Html$Events$onInput = function (tagger) {
 			elm$html$Html$Events$alwaysStop,
 			A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetValue)));
 };
+var elm$html$Html$Events$alwaysPreventDefault = function (msg) {
+	return _Utils_Tuple2(msg, true);
+};
+var elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
+	return {$: 'MayPreventDefault', a: a};
+};
+var elm$html$Html$Events$preventDefaultOn = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
+	});
+var elm$html$Html$Events$onSubmit = function (msg) {
+	return A2(
+		elm$html$Html$Events$preventDefaultOn,
+		'submit',
+		A2(
+			elm$json$Json$Decode$map,
+			elm$html$Html$Events$alwaysPreventDefault,
+			elm$json$Json$Decode$succeed(msg)));
+};
 var author$project$Page$Auth$Sessions$view = function (model) {
 	return A2(
 		elm$html$Html$div,
@@ -7289,7 +7407,10 @@ var author$project$Page$Auth$Sessions$view = function (model) {
 					[
 						A2(
 						elm$html$Html$form,
-						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$Events$onSubmit(author$project$Page$Auth$Sessions$LogInRequested)
+							]),
 						_List_fromArray(
 							[
 								A2(
@@ -7723,28 +7844,6 @@ var elm$html$Html$Events$onCheck = function (tagger) {
 		elm$html$Html$Events$on,
 		'change',
 		A2(elm$json$Json$Decode$map, tagger, elm$html$Html$Events$targetChecked));
-};
-var elm$html$Html$Events$alwaysPreventDefault = function (msg) {
-	return _Utils_Tuple2(msg, true);
-};
-var elm$virtual_dom$VirtualDom$MayPreventDefault = function (a) {
-	return {$: 'MayPreventDefault', a: a};
-};
-var elm$html$Html$Events$preventDefaultOn = F2(
-	function (event, decoder) {
-		return A2(
-			elm$virtual_dom$VirtualDom$on,
-			event,
-			elm$virtual_dom$VirtualDom$MayPreventDefault(decoder));
-	});
-var elm$html$Html$Events$onSubmit = function (msg) {
-	return A2(
-		elm$html$Html$Events$preventDefaultOn,
-		'submit',
-		A2(
-			elm$json$Json$Decode$map,
-			elm$html$Html$Events$alwaysPreventDefault,
-			elm$json$Json$Decode$succeed(msg)));
 };
 var author$project$Page$Todos$Edit$view = function (model) {
 	return A2(

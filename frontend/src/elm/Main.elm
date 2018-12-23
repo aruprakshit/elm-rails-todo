@@ -5,8 +5,8 @@ import Browser.Navigation as Nav
 import Config exposing (backendDomain)
 import Decoders.Flags exposing (decodeFlags)
 import Decoders.Todos exposing (todoDecoder, todosListDecoder)
+import Entities.Signin as Signin
 import Entities.Todo as Todo
-import Entities.User as User
 import Html exposing (Html, div, h1, text)
 import Html.Attributes exposing (class)
 import Http
@@ -45,12 +45,12 @@ type State
     | Home (List Todo.Model)
     | ShowTodo (Maybe Todo.Model)
     | NoPageFound
-    | Session User.Model
+    | Session Signin.Model
 
 
 initialModel : Nav.Key -> AuthState -> Model
 initialModel key authState =
-    Model key (Session User.initialModel) authState
+    Model key (Session Signin.initialModel) authState
 
 
 
@@ -72,8 +72,8 @@ getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
 getCurrentPageData model url =
     case toRoute <| Url.toString url of
         Index ->
-            ( model
-            , fetchTodos
+            ( { model | state = Home [] }
+            , fetchTodos model
             )
 
         New ->
@@ -92,7 +92,7 @@ getCurrentPageData model url =
             )
 
         Login ->
-            ( { model | state = Session User.initialModel }, Cmd.none )
+            ( { model | state = Session Signin.initialModel }, Cmd.none )
 
         NotFound ->
             ( { model | state = NoPageFound }
@@ -169,7 +169,7 @@ update msg model =
 
 init : JD.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
-    case decodeFlags flags of
+    case Debug.log "Log" (decodeFlags flags) of
         Just authToken ->
             getCurrentPageData (initialModel navKey (Authenticated authToken)) url
 
@@ -281,11 +281,27 @@ main =
         }
 
 
-fetchTodos : Cmd Msg
-fetchTodos =
-    Http.get
-        { url = backendDomain ++ UB.absolute [ "todos" ] []
+fetchTodos : Model -> Cmd Msg
+fetchTodos model =
+    let
+        authToken =
+            case model.authState of
+                Authenticated token ->
+                    token
+
+                NotAuthenticated ->
+                    ""
+    in
+    Http.request
+        { method = "GET"
+        , headers =
+            [ Http.header "Authorization" authToken
+            ]
+        , url = backendDomain ++ UB.absolute [ "todos" ] []
+        , body = Http.emptyBody
         , expect = Http.expectJson GotTodos todosListDecoder
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 
