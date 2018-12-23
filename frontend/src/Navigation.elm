@@ -10,6 +10,7 @@ type Route
     | Index
     | Show Int
     | NotFound
+    | Login
 
 
 route : Parser (Route -> a) a
@@ -19,6 +20,7 @@ route =
         , map New (s "todos" </> s "new")
         , map Edit (s "todos" </> int </> s "edit")
         , map Show (s "todos" </> int)
+        , map Login (s "sign-in")
         ]
 
 

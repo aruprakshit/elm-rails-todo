@@ -6,9 +6,11 @@ import Config exposing (backendDomain)
 import Decoders.Todos exposing (todoDecoder, todosListDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, div, h1, text)
+import Html.Attributes exposing (class)
 import Http
 import Json.Decode as JD
 import Navigation exposing (Route(..), toRoute)
+import Page.Auth.Sessions as SessionsPage
 import Page.Home as HomePage
 import Page.NotFound as PageNotFound
 import Page.Todos.Edit as EditTodoPage
@@ -35,6 +37,7 @@ type State
     | Home (List Todo.Model)
     | ShowTodo (Maybe Todo.Model)
     | NoPageFound
+    | Session
 
 
 initialModel : Nav.Key -> Model
@@ -78,6 +81,9 @@ getCurrentPageData model url =
             ( { model | state = EditTodo Nothing }
             , fetchTodo todoId
             )
+
+        Login ->
+            ( { model | state = Session }, Cmd.none )
 
         NotFound ->
             ( { model | state = NoPageFound }
@@ -190,6 +196,9 @@ pageTitle state =
                 Nothing ->
                     "Loading"
 
+        Session ->
+            "Log in"
+
         NoPageFound ->
             "Page not found"
 
@@ -216,10 +225,13 @@ pageBody { key, state } =
                         Nothing ->
                             text "Loading"
 
+                Session ->
+                    SessionsPage.view
+
                 NoPageFound ->
                     PageNotFound.view
     in
-    div []
+    div [ class "container" ]
         [ body
         ]
 
