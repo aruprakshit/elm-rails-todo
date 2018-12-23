@@ -4508,6 +4508,10 @@ var author$project$Main$ActivatedLink = function (a) {
 var author$project$Main$ChangedUrl = function (a) {
 	return {$: 'ChangedUrl', a: a};
 };
+var author$project$Config$Authenticated = function (a) {
+	return {$: 'Authenticated', a: a};
+};
+var author$project$Config$NotAuthenticated = {$: 'NotAuthenticated'};
 var elm$core$Maybe$Just = function (a) {
 	return {$: 'Just', a: a};
 };
@@ -4994,10 +4998,6 @@ var author$project$Decoders$Flags$decodeFlags = function (json) {
 		return elm$core$Maybe$Nothing;
 	}
 };
-var author$project$Main$Authenticated = function (a) {
-	return {$: 'Authenticated', a: a};
-};
-var author$project$Main$NotAuthenticated = {$: 'NotAuthenticated'};
 var author$project$Entities$Signin$Model = F2(
 	function (email, password) {
 		return {email: email, password: password};
@@ -6683,11 +6683,11 @@ var author$project$Main$init = F3(
 				A2(
 					author$project$Main$initialModel,
 					navKey,
-					author$project$Main$Authenticated(authToken)),
+					author$project$Config$Authenticated(authToken)),
 				url);
 		} else {
 			return _Utils_Tuple2(
-				A2(author$project$Main$initialModel, navKey, author$project$Main$NotAuthenticated),
+				A2(author$project$Main$initialModel, navKey, author$project$Config$NotAuthenticated),
 				A2(
 					elm$browser$Browser$Navigation$pushUrl,
 					navKey,
@@ -6703,6 +6703,10 @@ var elm$core$Platform$Sub$none = elm$core$Platform$Sub$batch(_List_Nil);
 var author$project$Main$subscriptions = function (_n0) {
 	return elm$core$Platform$Sub$none;
 };
+var author$project$Config$Model = F2(
+	function (token, key) {
+		return {key: key, token: token};
+	});
 var author$project$Main$EditTodoPageMsg = function (a) {
 	return {$: 'EditTodoPageMsg', a: a};
 };
@@ -6842,25 +6846,38 @@ var elm$http$Http$expectWhatever = function (toMsg) {
 				return elm$core$Result$Ok(_Utils_Tuple0);
 			}));
 };
-var author$project$Page$Home$deleteTodo = function (todoId) {
-	return elm$http$Http$request(
-		{
-			body: elm$http$Http$emptyBody,
-			expect: elm$http$Http$expectWhatever(
-				author$project$Page$Home$Deleted(todoId)),
-			headers: _List_Nil,
-			method: 'DELETE',
-			timeout: elm$core$Maybe$Nothing,
-			tracker: elm$core$Maybe$Nothing,
-			url: _Utils_ap(
-				author$project$Config$backendDomain,
-				A2(
-					elm$url$Url$Builder$absolute,
-					_List_fromArray(
-						['todos', todoId]),
-					_List_Nil))
-		});
-};
+var author$project$Page$Home$deleteTodo = F2(
+	function (config, todoId) {
+		var authToken = function () {
+			var _n0 = config.token;
+			if (_n0.$ === 'Authenticated') {
+				var value = _n0.a;
+				return value;
+			} else {
+				return '';
+			}
+		}();
+		return elm$http$Http$request(
+			{
+				body: elm$http$Http$emptyBody,
+				expect: elm$http$Http$expectWhatever(
+					author$project$Page$Home$Deleted(todoId)),
+				headers: _List_fromArray(
+					[
+						A2(elm$http$Http$header, 'Authorization', authToken)
+					]),
+				method: 'DELETE',
+				timeout: elm$core$Maybe$Nothing,
+				tracker: elm$core$Maybe$Nothing,
+				url: _Utils_ap(
+					author$project$Config$backendDomain,
+					A2(
+						elm$url$Url$Builder$absolute,
+						_List_fromArray(
+							['todos', todoId]),
+						_List_Nil))
+			});
+	});
 var author$project$Page$Home$SearchResults = function (a) {
 	return {$: 'SearchResults', a: a};
 };
@@ -6876,23 +6893,40 @@ var elm$url$Url$Builder$string = F2(
 			elm$url$Url$percentEncode(key),
 			elm$url$Url$percentEncode(value));
 	});
-var author$project$Page$Home$searchTodos = function (filterValue) {
-	return elm$http$Http$post(
-		{
-			body: elm$http$Http$emptyBody,
-			expect: A2(elm$http$Http$expectJson, author$project$Page$Home$SearchResults, author$project$Decoders$Todos$todosListDecoder),
-			url: _Utils_ap(
-				author$project$Config$backendDomain,
-				A2(
-					elm$url$Url$Builder$absolute,
-					_List_fromArray(
-						['todos', 'search']),
-					_List_fromArray(
-						[
-							A2(elm$url$Url$Builder$string, 'q', filterValue)
-						])))
-		});
-};
+var author$project$Page$Home$searchTodos = F2(
+	function (config, filterValue) {
+		var authToken = function () {
+			var _n0 = config.token;
+			if (_n0.$ === 'Authenticated') {
+				var value = _n0.a;
+				return value;
+			} else {
+				return '';
+			}
+		}();
+		return elm$http$Http$request(
+			{
+				body: elm$http$Http$emptyBody,
+				expect: A2(elm$http$Http$expectJson, author$project$Page$Home$SearchResults, author$project$Decoders$Todos$todosListDecoder),
+				headers: _List_fromArray(
+					[
+						A2(elm$http$Http$header, 'Authorization', authToken)
+					]),
+				method: 'POST',
+				timeout: elm$core$Maybe$Nothing,
+				tracker: elm$core$Maybe$Nothing,
+				url: _Utils_ap(
+					author$project$Config$backendDomain,
+					A2(
+						elm$url$Url$Builder$absolute,
+						_List_fromArray(
+							['todos', 'search']),
+						_List_fromArray(
+							[
+								A2(elm$url$Url$Builder$string, 'q', filterValue)
+							])))
+			});
+	});
 var elm$core$Basics$neq = _Utils_notEqual;
 var elm$core$List$filter = F2(
 	function (isGood, list) {
@@ -6905,8 +6939,8 @@ var elm$core$List$filter = F2(
 			_List_Nil,
 			list);
 	});
-var author$project$Page$Home$update = F2(
-	function (msg, model) {
+var author$project$Page$Home$update = F3(
+	function (config, msg, model) {
 		switch (msg.$) {
 			case 'NoOp':
 				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
@@ -6914,7 +6948,7 @@ var author$project$Page$Home$update = F2(
 				var filterValue = msg.a;
 				return _Utils_Tuple2(
 					model,
-					author$project$Page$Home$searchTodos(filterValue));
+					A2(author$project$Page$Home$searchTodos, config, filterValue));
 			case 'SearchResults':
 				var response = msg.a;
 				if (response.$ === 'Ok') {
@@ -6927,7 +6961,7 @@ var author$project$Page$Home$update = F2(
 				var todoId = msg.a;
 				return _Utils_Tuple2(
 					model,
-					author$project$Page$Home$deleteTodo(todoId));
+					A2(author$project$Page$Home$deleteTodo, config, todoId));
 			default:
 				var todoid = msg.a;
 				var response = msg.b;
@@ -7009,7 +7043,7 @@ var author$project$Page$Todos$Edit$updateTodo = function (formData) {
 		});
 };
 var author$project$Page$Todos$Edit$update = F3(
-	function (key, msg, model) {
+	function (config, msg, model) {
 		switch (msg.$) {
 			case 'OnInputChange':
 				switch (msg.a) {
@@ -7053,7 +7087,7 @@ var author$project$Page$Todos$Edit$update = F3(
 					model,
 					A2(
 						elm$browser$Browser$Navigation$pushUrl,
-						key,
+						config.key,
 						A2(
 							elm$url$Url$Builder$absolute,
 							_List_fromArray(
@@ -7152,6 +7186,7 @@ var elm$core$Tuple$mapSecond = F2(
 	});
 var author$project$Main$update = F2(
 	function (msg, model) {
+		var config = A2(author$project$Config$Model, model.authState, model.key);
 		var _n0 = _Utils_Tuple2(msg, model.state);
 		_n0$8:
 		while (true) {
@@ -7175,7 +7210,7 @@ var author$project$Main$update = F2(
 								},
 								A3(
 									author$project$Page$Todos$Edit$update,
-									model.key,
+									config,
 									editMsg,
 									A2(elm$core$Maybe$withDefault, author$project$Entities$Todo$initialModel, todo))));
 					} else {
@@ -7197,7 +7232,7 @@ var author$project$Main$update = F2(
 											state: author$project$Main$Home(newTodos)
 										});
 								},
-								A2(author$project$Page$Home$update, homeMsg, todos)));
+								A3(author$project$Page$Home$update, config, homeMsg, todos)));
 					} else {
 						break _n0$8;
 					}
@@ -7303,16 +7338,9 @@ var author$project$Main$update = F2(
 		}
 		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	});
-var author$project$Page$Auth$Sessions$LogInRequested = {$: 'LogInRequested'};
-var author$project$Page$Auth$Sessions$OnInputChange = F2(
-	function (a, b) {
-		return {$: 'OnInputChange', a: a, b: b};
-	});
-var elm$html$Html$button = _VirtualDom_node('button');
+var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$div = _VirtualDom_node('div');
-var elm$html$Html$form = _VirtualDom_node('form');
-var elm$html$Html$input = _VirtualDom_node('input');
-var elm$html$Html$label = _VirtualDom_node('label');
+var elm$html$Html$nav = _VirtualDom_node('nav');
 var elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var elm$html$Html$text = elm$virtual_dom$VirtualDom$text;
 var elm$html$Html$Attributes$stringProperty = F2(
@@ -7323,6 +7351,61 @@ var elm$html$Html$Attributes$stringProperty = F2(
 			elm$json$Json$Encode$string(string));
 	});
 var elm$html$Html$Attributes$class = elm$html$Html$Attributes$stringProperty('className');
+var elm$html$Html$Attributes$href = function (url) {
+	return A2(
+		elm$html$Html$Attributes$stringProperty,
+		'href',
+		_VirtualDom_noJavaScriptUri(url));
+};
+var author$project$Main$navView = A2(
+	elm$html$Html$div,
+	_List_fromArray(
+		[
+			elm$html$Html$Attributes$class('container')
+		]),
+	_List_fromArray(
+		[
+			A2(
+			elm$html$Html$nav,
+			_List_fromArray(
+				[
+					elm$html$Html$Attributes$class('navbar navbar-light bg-light')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					elm$html$Html$a,
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$class('navbar-brand'),
+							elm$html$Html$Attributes$href('/')
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text('Company Logo')
+						])),
+					A2(
+					elm$html$Html$a,
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$class('navbar-brand btn btn-info'),
+							elm$html$Html$Attributes$href('/')
+						]),
+					_List_fromArray(
+						[
+							elm$html$Html$text('Log out')
+						]))
+				]))
+		]));
+var author$project$Page$Auth$Sessions$LogInRequested = {$: 'LogInRequested'};
+var author$project$Page$Auth$Sessions$OnInputChange = F2(
+	function (a, b) {
+		return {$: 'OnInputChange', a: a, b: b};
+	});
+var elm$html$Html$button = _VirtualDom_node('button');
+var elm$html$Html$form = _VirtualDom_node('form');
+var elm$html$Html$input = _VirtualDom_node('input');
+var elm$html$Html$label = _VirtualDom_node('label');
 var elm$html$Html$Attributes$for = elm$html$Html$Attributes$stringProperty('htmlFor');
 var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
 var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
@@ -7525,15 +7608,8 @@ var author$project$Page$Auth$Sessions$view = function (model) {
 var author$project$Page$Home$Delete = function (a) {
 	return {$: 'Delete', a: a};
 };
-var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$td = _VirtualDom_node('td');
 var elm$html$Html$tr = _VirtualDom_node('tr');
-var elm$html$Html$Attributes$href = function (url) {
-	return A2(
-		elm$html$Html$Attributes$stringProperty,
-		'href',
-		_VirtualDom_noJavaScriptUri(url));
-};
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -8320,6 +8396,7 @@ var author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
+				author$project$Main$navView,
 				author$project$Main$pageBody(model)
 			]),
 		title: author$project$Main$pageTitle(model.state)

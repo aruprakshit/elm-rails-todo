@@ -1,6 +1,6 @@
 module Page.Home exposing (Msg(..), update, view)
 
-import Config exposing (backendDomain)
+import Config exposing (AuthState(..), backendDomain)
 import Decoders.Todos exposing (todosListDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, caption, div, option, select, table, tbody, td, text, th, thead, tr)
@@ -23,14 +23,14 @@ type alias Model =
     List Todo.Model
 
 
-update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
+update : Config.Model -> Msg -> Model -> ( Model, Cmd Msg )
+update config msg model =
     case msg of
         NoOp ->
             ( model, Cmd.none )
 
         ChangeFilter filterValue ->
-            ( model, searchTodos filterValue )
+            ( model, searchTodos config filterValue )
 
         SearchResults response ->
             case response of
@@ -41,7 +41,7 @@ update msg model =
                     ( model, Cmd.none )
 
         Delete todoId ->
-            ( model, deleteTodo todoId )
+            ( model, deleteTodo config todoId )
 
         Deleted todoid response ->
             let
@@ -113,11 +113,22 @@ tableBody todos =
         todos
 
 
-deleteTodo : String -> Cmd Msg
-deleteTodo todoId =
+deleteTodo : Config.Model -> String -> Cmd Msg
+deleteTodo config todoId =
+    let
+        authToken =
+            case config.token of
+                Authenticated value ->
+                    value
+
+                NotAuthenticated ->
+                    ""
+    in
     Http.request
         { method = "DELETE"
-        , headers = []
+        , headers =
+            [ Http.header "Authorization" authToken
+            ]
         , url = backendDomain ++ UB.absolute [ "todos", todoId ] []
         , body = Http.emptyBody
         , expect = Http.expectWhatever (Deleted todoId)
@@ -126,12 +137,27 @@ deleteTodo todoId =
         }
 
 
-searchTodos : String -> Cmd Msg
-searchTodos filterValue =
-    Http.post
-        { url =
+searchTodos : Config.Model -> String -> Cmd Msg
+searchTodos config filterValue =
+    let
+        authToken =
+            case config.token of
+                Authenticated value ->
+                    value
+
+                NotAuthenticated ->
+                    ""
+    in
+    Http.request
+        { method = "POST"
+        , headers =
+            [ Http.header "Authorization" authToken
+            ]
+        , url =
             backendDomain
                 ++ UB.absolute [ "todos", "search" ] [ UB.string "q" filterValue ]
-        , expect = Http.expectJson SearchResults todosListDecoder
         , body = Http.emptyBody
+        , expect = Http.expectJson SearchResults todosListDecoder
+        , timeout = Nothing
+        , tracker = Nothing
         }

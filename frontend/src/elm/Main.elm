@@ -2,13 +2,13 @@ module Main exposing (main)
 
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
-import Config exposing (backendDomain)
+import Config exposing (AuthState(..), backendDomain)
 import Decoders.Flags exposing (decodeFlags)
 import Decoders.Todos exposing (todoDecoder, todosListDecoder)
 import Entities.Signin as Signin
 import Entities.Todo as Todo
-import Html exposing (Html, div, h1, text)
-import Html.Attributes exposing (class)
+import Html exposing (Html, a, div, h1, nav, text)
+import Html.Attributes exposing (class, href)
 import Http
 import Json.Decode as JD
 import Navigation exposing (Route(..), toRoute)
@@ -25,11 +25,6 @@ import Utils.Todo exposing (idToString)
 
 
 -- MODEL
-
-
-type AuthState
-    = NotAuthenticated
-    | Authenticated String
 
 
 type alias Model =
@@ -102,14 +97,18 @@ getCurrentPageData model url =
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
+    let
+        config =
+            Config.Model model.authState model.key
+    in
     case ( msg, model.state ) of
         ( EditTodoPageMsg editMsg, EditTodo todo ) ->
-            EditTodoPage.update model.key editMsg (Maybe.withDefault Todo.initialModel todo)
+            EditTodoPage.update config editMsg (Maybe.withDefault Todo.initialModel todo)
                 |> Tuple.mapFirst (\newTodo -> { model | state = EditTodo (Just newTodo) })
                 |> Tuple.mapSecond (Cmd.map EditTodoPageMsg)
 
         ( HomePageMsg homeMsg, Home todos ) ->
-            HomePage.update homeMsg todos
+            HomePage.update config homeMsg todos
                 |> Tuple.mapFirst (\newTodos -> { model | state = Home newTodos })
                 |> Tuple.mapSecond (Cmd.map HomePageMsg)
 
@@ -192,6 +191,16 @@ subscriptions _ =
 -- VIEW
 
 
+navView : Html msg
+navView =
+    div [ class "container" ]
+        [ nav [ class "navbar navbar-light bg-light" ]
+            [ a [ class "navbar-brand", href "/" ] [ text "Company Logo" ]
+            , a [ class "navbar-brand btn btn-info", href "/" ] [ text "Log out" ]
+            ]
+        ]
+
+
 pageTitle : State -> String
 pageTitle state =
     case state of
@@ -261,7 +270,8 @@ view : Model -> Document Msg
 view model =
     { title = pageTitle model.state
     , body =
-        [ pageBody model
+        [ navView
+        , pageBody model
         ]
     }
 

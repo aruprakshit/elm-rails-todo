@@ -1,7 +1,7 @@
 module Page.Todos.Edit exposing (Model, Msg(..), update, view)
 
 import Browser.Navigation as Nav
-import Config exposing (backendDomain)
+import Config exposing (AuthState(..), backendDomain)
 import Decoders.Todos exposing (todoDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, div, form, h1, input, label, text, textarea)
@@ -24,8 +24,8 @@ type alias Model =
     Todo.Model
 
 
-update : Nav.Key -> Msg -> Model -> ( Model, Cmd Msg )
-update key msg model =
+update : Config.Model -> Msg -> Model -> ( Model, Cmd Msg )
+update config msg model =
     case msg of
         OnInputChange "title" value ->
             ( { model | title = value }, Cmd.none )
@@ -46,7 +46,7 @@ update key msg model =
             ( model, updateTodo model )
 
         UpdatedTodo response ->
-            ( model, Nav.pushUrl key (UB.absolute [ "todos", idToString model.id ] []) )
+            ( model, Nav.pushUrl config.key (UB.absolute [ "todos", idToString model.id ] []) )
 
 
 view : Model -> Html Msg
