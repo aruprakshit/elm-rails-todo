@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser exposing (Document, UrlRequest(..))
 import Browser.Navigation as Nav
 import Config exposing (backendDomain)
+import Decoders.Flags exposing (decodeFlags)
 import Decoders.Todos exposing (todoDecoder, todosListDecoder)
 import Entities.Todo as Todo
 import Entities.User as User
@@ -26,9 +27,15 @@ import Utils.Todo exposing (idToString)
 -- MODEL
 
 
+type AuthState
+    = NotAuthenticated
+    | Authenticated String
+
+
 type alias Model =
     { key : Nav.Key
     , state : State
+    , authState : AuthState
     }
 
 
@@ -41,9 +48,9 @@ type State
     | Session User.Model
 
 
-initialModel : Nav.Key -> Model
-initialModel key =
-    Model key (Home [])
+initialModel : Nav.Key -> AuthState -> Model
+initialModel key authState =
+    Model key (Session User.initialModel) authState
 
 
 
@@ -160,9 +167,16 @@ update msg model =
 -- INIT
 
 
-init : () -> Url -> Nav.Key -> ( Model, Cmd Msg )
+init : JD.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
-    getCurrentPageData (initialModel navKey) url
+    case decodeFlags flags of
+        Just authToken ->
+            getCurrentPageData (initialModel navKey (Authenticated authToken)) url
+
+        Nothing ->
+            ( initialModel navKey NotAuthenticated
+            , Nav.pushUrl navKey (UB.absolute [ "sign-in" ] [])
+            )
 
 
 

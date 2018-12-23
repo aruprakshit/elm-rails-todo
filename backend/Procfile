@@ -1,2 +1,3 @@
 backend: bundle exec rails s
+webpack: sh -c 'cd ../frontend/ && npm run build && npm run client'
 frontend: sh -c 'cd ../frontend/ && npm run client'

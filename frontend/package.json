@@ -5,10 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "client": "elm-live ./src/Main.elm --open --dir=public --pushstate --path-to-elm=node_modules/.bin/elm -- --output=public/app.js",
+    "client": "elm-live ./src/elm/Main.elm --open --dir=public --pushstate --path-to-elm=node_modules/.bin/elm -- --output=public/elm.js",
     "elm:install": "elm install",
     "elm:repl": "elm repl",
-    "live": "elm-live --help"
+    "live": "elm-live --help",
+    "build": "webpack"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +17,11 @@
   "devDependencies": {
     "elm": "^0.19.0-bugfix2",
     "elm-format": "^0.8.1",
-    "elm-live": "^3.2.3"
+    "elm-live": "^3.2.3",
+    "webpack": "^4.28.2",
+    "webpack-cli": "^3.1.2"
+  },
+  "dependencies": {
+    "js-cookie": "^2.2.0"
   }
 }
