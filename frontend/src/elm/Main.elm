@@ -78,12 +78,12 @@ getCurrentPageData model url =
 
         Show todoId ->
             ( { model | state = ShowTodo Nothing }
-            , fetchTodo todoId
+            , fetchTodo model todoId
             )
 
         Edit todoId ->
             ( { model | state = EditTodo Nothing }
-            , fetchTodo todoId
+            , fetchTodo model todoId
             )
 
         Login ->
@@ -315,9 +315,25 @@ fetchTodos model =
         }
 
 
-fetchTodo : Int -> Cmd Msg
-fetchTodo todoId =
-    Http.get
-        { url = backendDomain ++ UB.absolute [ "todos", String.fromInt todoId ] []
+fetchTodo : Model -> Int -> Cmd Msg
+fetchTodo model todoId =
+    let
+        authToken =
+            case model.authState of
+                Authenticated token ->
+                    token
+
+                NotAuthenticated ->
+                    ""
+    in
+    Http.request
+        { method = "GET"
+        , headers =
+            [ Http.header "Authorization" authToken
+            ]
+        , url = backendDomain ++ UB.absolute [ "todos", String.fromInt todoId ] []
+        , body = Http.emptyBody
         , expect = Http.expectJson GotTodo todoDecoder
+        , timeout = Nothing
+        , tracker = Nothing
         }

@@ -43,7 +43,7 @@ update config msg model =
             ( model, Cmd.none )
 
         UpdateTodo ->
-            ( model, updateTodo model )
+            ( model, updateTodo config model )
 
         UpdatedTodo response ->
             ( model, Nav.pushUrl config.key (UB.absolute [ "todos", idToString model.id ] []) )
@@ -99,11 +99,22 @@ view model =
         ]
 
 
-updateTodo : Model -> Cmd Msg
-updateTodo formData =
+updateTodo : Config.Model -> Model -> Cmd Msg
+updateTodo config formData =
+    let
+        authToken =
+            case config.token of
+                Authenticated value ->
+                    value
+
+                NotAuthenticated ->
+                    ""
+    in
     Http.request
         { method = "PUT"
-        , headers = []
+        , headers =
+            [ Http.header "Authorization" authToken
+            ]
         , url = backendDomain ++ UB.absolute [ "todos", idToString formData.id ] []
         , body = Http.jsonBody <| todoPayload formData
         , expect = Http.expectJson UpdatedTodo todoDecoder

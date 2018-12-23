@@ -5052,25 +5052,6 @@ var author$project$Decoders$Todos$todoDecoder = A5(
 var author$project$Main$GotTodo = function (a) {
 	return {$: 'GotTodo', a: a};
 };
-var elm$core$Result$mapError = F2(
-	function (f, result) {
-		if (result.$ === 'Ok') {
-			var v = result.a;
-			return elm$core$Result$Ok(v);
-		} else {
-			var e = result.a;
-			return elm$core$Result$Err(
-				f(e));
-		}
-	});
-var elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var elm$core$Basics$identity = function (x) {
-	return x;
-};
 var elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var elm$core$Dict$empty = elm$core$Dict$RBEmpty_elm_builtin;
 var elm$core$Basics$compare = _Utils_compare;
@@ -5625,6 +5606,26 @@ var elm$http$Http$Sending = function (a) {
 	return {$: 'Sending', a: a};
 };
 var elm$http$Http$Timeout_ = {$: 'Timeout_'};
+var elm$http$Http$emptyBody = _Http_emptyBody;
+var elm$core$Result$mapError = F2(
+	function (f, result) {
+		if (result.$ === 'Ok') {
+			var v = result.a;
+			return elm$core$Result$Ok(v);
+		} else {
+			var e = result.a;
+			return elm$core$Result$Err(
+				f(e));
+		}
+	});
+var elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var elm$core$Basics$identity = function (x) {
+	return x;
+};
 var elm$http$Http$expectStringResponse = F2(
 	function (toMsg, toResult) {
 		return A3(
@@ -5681,7 +5682,11 @@ var elm$http$Http$expectJson = F2(
 						A2(elm$json$Json$Decode$decodeString, decoder, string));
 				}));
 	});
-var elm$http$Http$emptyBody = _Http_emptyBody;
+var elm$http$Http$Header = F2(
+	function (a, b) {
+		return {$: 'Header', a: a, b: b};
+	});
+var elm$http$Http$header = elm$http$Http$Header;
 var elm$http$Http$Request = function (a) {
 	return {$: 'Request', a: a};
 };
@@ -5929,10 +5934,6 @@ var elm$http$Http$request = function (r) {
 		elm$http$Http$Request(
 			{allowCookiesFromOtherDomains: false, body: r.body, expect: r.expect, headers: r.headers, method: r.method, timeout: r.timeout, tracker: r.tracker, url: r.url}));
 };
-var elm$http$Http$get = function (r) {
-	return elm$http$Http$request(
-		{body: elm$http$Http$emptyBody, expect: r.expect, headers: _List_Nil, method: 'GET', timeout: elm$core$Maybe$Nothing, tracker: elm$core$Maybe$Nothing, url: r.url});
-};
 var elm$core$List$map = F2(
 	function (f, xs) {
 		return A3(
@@ -5966,32 +5967,45 @@ var elm$url$Url$Builder$absolute = F2(
 	function (pathSegments, parameters) {
 		return '/' + (A2(elm$core$String$join, '/', pathSegments) + elm$url$Url$Builder$toQuery(parameters));
 	});
-var author$project$Main$fetchTodo = function (todoId) {
-	return elm$http$Http$get(
-		{
-			expect: A2(elm$http$Http$expectJson, author$project$Main$GotTodo, author$project$Decoders$Todos$todoDecoder),
-			url: _Utils_ap(
-				author$project$Config$backendDomain,
-				A2(
-					elm$url$Url$Builder$absolute,
-					_List_fromArray(
-						[
-							'todos',
-							elm$core$String$fromInt(todoId)
-						]),
-					_List_Nil))
-		});
-};
+var author$project$Main$fetchTodo = F2(
+	function (model, todoId) {
+		var authToken = function () {
+			var _n0 = model.authState;
+			if (_n0.$ === 'Authenticated') {
+				var token = _n0.a;
+				return token;
+			} else {
+				return '';
+			}
+		}();
+		return elm$http$Http$request(
+			{
+				body: elm$http$Http$emptyBody,
+				expect: A2(elm$http$Http$expectJson, author$project$Main$GotTodo, author$project$Decoders$Todos$todoDecoder),
+				headers: _List_fromArray(
+					[
+						A2(elm$http$Http$header, 'Authorization', authToken)
+					]),
+				method: 'GET',
+				timeout: elm$core$Maybe$Nothing,
+				tracker: elm$core$Maybe$Nothing,
+				url: _Utils_ap(
+					author$project$Config$backendDomain,
+					A2(
+						elm$url$Url$Builder$absolute,
+						_List_fromArray(
+							[
+								'todos',
+								elm$core$String$fromInt(todoId)
+							]),
+						_List_Nil))
+			});
+	});
 var elm$json$Json$Decode$list = _Json_decodeList;
 var author$project$Decoders$Todos$todosListDecoder = elm$json$Json$Decode$list(author$project$Decoders$Todos$todoDecoder);
 var author$project$Main$GotTodos = function (a) {
 	return {$: 'GotTodos', a: a};
 };
-var elm$http$Http$Header = F2(
-	function (a, b) {
-		return {$: 'Header', a: a, b: b};
-	});
-var elm$http$Http$header = elm$http$Http$Header;
 var author$project$Main$fetchTodos = function (model) {
 	var authToken = function () {
 		var _n0 = model.authState;
@@ -6549,7 +6563,7 @@ var author$project$Main$getCurrentPageData = F2(
 						{
 							state: author$project$Main$ShowTodo(elm$core$Maybe$Nothing)
 						}),
-					author$project$Main$fetchTodo(todoId));
+					A2(author$project$Main$fetchTodo, model, todoId));
 			case 'Edit':
 				var todoId = _n0.a;
 				return _Utils_Tuple2(
@@ -6558,7 +6572,7 @@ var author$project$Main$getCurrentPageData = F2(
 						{
 							state: author$project$Main$EditTodo(elm$core$Maybe$Nothing)
 						}),
-					author$project$Main$fetchTodo(todoId));
+					A2(author$project$Main$fetchTodo, model, todoId));
 			case 'Login':
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7020,28 +7034,41 @@ var author$project$Utils$Todo$idToString = function (number) {
 		'',
 		A2(elm$core$Maybe$map, elm$core$String$fromInt, number));
 };
-var author$project$Page$Todos$Edit$updateTodo = function (formData) {
-	return elm$http$Http$request(
-		{
-			body: elm$http$Http$jsonBody(
-				author$project$Page$Todos$Edit$todoPayload(formData)),
-			expect: A2(elm$http$Http$expectJson, author$project$Page$Todos$Edit$UpdatedTodo, author$project$Decoders$Todos$todoDecoder),
-			headers: _List_Nil,
-			method: 'PUT',
-			timeout: elm$core$Maybe$Nothing,
-			tracker: elm$core$Maybe$Nothing,
-			url: _Utils_ap(
-				author$project$Config$backendDomain,
-				A2(
-					elm$url$Url$Builder$absolute,
-					_List_fromArray(
-						[
-							'todos',
-							author$project$Utils$Todo$idToString(formData.id)
-						]),
-					_List_Nil))
-		});
-};
+var author$project$Page$Todos$Edit$updateTodo = F2(
+	function (config, formData) {
+		var authToken = function () {
+			var _n0 = config.token;
+			if (_n0.$ === 'Authenticated') {
+				var value = _n0.a;
+				return value;
+			} else {
+				return '';
+			}
+		}();
+		return elm$http$Http$request(
+			{
+				body: elm$http$Http$jsonBody(
+					author$project$Page$Todos$Edit$todoPayload(formData)),
+				expect: A2(elm$http$Http$expectJson, author$project$Page$Todos$Edit$UpdatedTodo, author$project$Decoders$Todos$todoDecoder),
+				headers: _List_fromArray(
+					[
+						A2(elm$http$Http$header, 'Authorization', authToken)
+					]),
+				method: 'PUT',
+				timeout: elm$core$Maybe$Nothing,
+				tracker: elm$core$Maybe$Nothing,
+				url: _Utils_ap(
+					author$project$Config$backendDomain,
+					A2(
+						elm$url$Url$Builder$absolute,
+						_List_fromArray(
+							[
+								'todos',
+								author$project$Utils$Todo$idToString(formData.id)
+							]),
+						_List_Nil))
+			});
+	});
 var author$project$Page$Todos$Edit$update = F3(
 	function (config, msg, model) {
 		switch (msg.$) {
@@ -7080,7 +7107,7 @@ var author$project$Page$Todos$Edit$update = F3(
 			case 'UpdateTodo':
 				return _Utils_Tuple2(
 					model,
-					author$project$Page$Todos$Edit$updateTodo(model));
+					A2(author$project$Page$Todos$Edit$updateTodo, config, model));
 			default:
 				var response = msg.a;
 				return _Utils_Tuple2(
