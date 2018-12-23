@@ -4,7 +4,7 @@ import Config exposing (backendDomain)
 import Decoders.Todos exposing (todosListDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, caption, div, option, select, table, tbody, td, text, th, thead, tr)
-import Html.Attributes exposing (class, href, type_, value)
+import Html.Attributes exposing (class, href, scope, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Url.Builder as UB
@@ -58,20 +58,24 @@ update msg model =
 
 view : Model -> Html Msg
 view todos =
-    div []
-        [ table []
-            [ caption [] [ text "All Todos" ]
-            , thead []
-                [ tr []
-                    [ th [ class "col" ] [ text "Title" ]
-                    , th [ class "col" ] [ text "Content" ]
-                    , th [ class "col" ] [ text "Completed?" ]
-                    , th [ class "col" ] [ tableFilter ]
+    div [ class "row" ]
+        [ div [ class "col-12" ]
+            [ table [ class "table table-striped" ]
+                [ caption [] [ text "All Todos" ]
+                , thead []
+                    [ tr []
+                        [ th [ scope "col" ] [ text "Title" ]
+                        , th [ scope "col" ] [ text "Content" ]
+                        , th [ scope "col" ] [ text "Completed?" ]
+                        , th [ scope "col" ] [ tableFilter ]
+                        ]
                     ]
+                , tbody [] (tableBody todos)
                 ]
-            , tbody [] (tableBody todos)
             ]
-        , a [ href "todos/new" ] [ text "Create Todo" ]
+        , div [ class "col-12" ]
+            [ a [ href "todos/new" ] [ text "Create Todo" ]
+            ]
         ]
 
 
@@ -101,8 +105,8 @@ tableBody todos =
                         )
                     ]
                 , td []
-                    [ a [ href ("todos/" ++ idToString todo.id) ] [ text "Show" ]
-                    , button [ type_ "button", onClick (Delete (idToString todo.id)) ] [ text "Delete" ]
+                    [ a [ href ("todos/" ++ idToString todo.id), class "btn btn-sm btn-primary" ] [ text "Show" ]
+                    , button [ type_ "button", onClick (Delete (idToString todo.id)), class "btn btn-sm btn-danger" ] [ text "Delete" ]
                     ]
                 ]
         )

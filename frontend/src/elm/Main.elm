@@ -169,7 +169,7 @@ update msg model =
 
 init : JD.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
-    case Debug.log "Log" (decodeFlags flags) of
+    case decodeFlags flags of
         Just authToken ->
             getCurrentPageData (initialModel navKey (Authenticated authToken)) url
 

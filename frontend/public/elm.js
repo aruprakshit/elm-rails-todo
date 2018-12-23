@@ -6673,13 +6673,9 @@ var elm$virtual_dom$VirtualDom$toHandlerInt = function (handler) {
 	}
 };
 var elm$browser$Browser$Navigation$pushUrl = _Browser_pushUrl;
-var elm$core$Debug$log = _Debug_log;
 var author$project$Main$init = F3(
 	function (flags, url, navKey) {
-		var _n0 = A2(
-			elm$core$Debug$log,
-			'Log',
-			author$project$Decoders$Flags$decodeFlags(flags));
+		var _n0 = author$project$Decoders$Flags$decodeFlags(flags);
 		if (_n0.$ === 'Just') {
 			var authToken = _n0.a;
 			return A2(
@@ -7596,7 +7592,8 @@ var author$project$Page$Home$tableBody = function (todos) {
 								_List_fromArray(
 									[
 										elm$html$Html$Attributes$href(
-										'todos/' + author$project$Utils$Todo$idToString(todo.id))
+										'todos/' + author$project$Utils$Todo$idToString(todo.id)),
+										elm$html$Html$Attributes$class('btn btn-sm btn-primary')
 									]),
 								_List_fromArray(
 									[
@@ -7609,7 +7606,8 @@ var author$project$Page$Home$tableBody = function (todos) {
 										elm$html$Html$Attributes$type_('button'),
 										elm$html$Html$Events$onClick(
 										author$project$Page$Home$Delete(
-											author$project$Utils$Todo$idToString(todo.id)))
+											author$project$Utils$Todo$idToString(todo.id))),
+										elm$html$Html$Attributes$class('btn btn-sm btn-danger')
 									]),
 								_List_fromArray(
 									[
@@ -7669,88 +7667,113 @@ var elm$html$Html$table = _VirtualDom_node('table');
 var elm$html$Html$tbody = _VirtualDom_node('tbody');
 var elm$html$Html$th = _VirtualDom_node('th');
 var elm$html$Html$thead = _VirtualDom_node('thead');
+var elm$html$Html$Attributes$scope = elm$html$Html$Attributes$stringProperty('scope');
 var author$project$Page$Home$view = function (todos) {
 	return A2(
 		elm$html$Html$div,
-		_List_Nil,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('row')
+			]),
 		_List_fromArray(
 			[
 				A2(
-				elm$html$Html$table,
-				_List_Nil,
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('col-12')
+					]),
 				_List_fromArray(
 					[
 						A2(
-						elm$html$Html$caption,
-						_List_Nil,
+						elm$html$Html$table,
 						_List_fromArray(
 							[
-								elm$html$Html$text('All Todos')
-							])),
-						A2(
-						elm$html$Html$thead,
-						_List_Nil,
+								elm$html$Html$Attributes$class('table table-striped')
+							]),
 						_List_fromArray(
 							[
 								A2(
-								elm$html$Html$tr,
+								elm$html$Html$caption,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text('All Todos')
+									])),
+								A2(
+								elm$html$Html$thead,
 								_List_Nil,
 								_List_fromArray(
 									[
 										A2(
-										elm$html$Html$th,
+										elm$html$Html$tr,
+										_List_Nil,
 										_List_fromArray(
 											[
-												elm$html$Html$Attributes$class('col')
-											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text('Title')
-											])),
-										A2(
-										elm$html$Html$th,
-										_List_fromArray(
-											[
-												elm$html$Html$Attributes$class('col')
-											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text('Content')
-											])),
-										A2(
-										elm$html$Html$th,
-										_List_fromArray(
-											[
-												elm$html$Html$Attributes$class('col')
-											]),
-										_List_fromArray(
-											[
-												elm$html$Html$text('Completed?')
-											])),
-										A2(
-										elm$html$Html$th,
-										_List_fromArray(
-											[
-												elm$html$Html$Attributes$class('col')
-											]),
-										_List_fromArray(
-											[author$project$Page$Home$tableFilter]))
-									]))
-							])),
-						A2(
-						elm$html$Html$tbody,
-						_List_Nil,
-						author$project$Page$Home$tableBody(todos))
+												A2(
+												elm$html$Html$th,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$scope('col')
+													]),
+												_List_fromArray(
+													[
+														elm$html$Html$text('Title')
+													])),
+												A2(
+												elm$html$Html$th,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$scope('col')
+													]),
+												_List_fromArray(
+													[
+														elm$html$Html$text('Content')
+													])),
+												A2(
+												elm$html$Html$th,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$scope('col')
+													]),
+												_List_fromArray(
+													[
+														elm$html$Html$text('Completed?')
+													])),
+												A2(
+												elm$html$Html$th,
+												_List_fromArray(
+													[
+														elm$html$Html$Attributes$scope('col')
+													]),
+												_List_fromArray(
+													[author$project$Page$Home$tableFilter]))
+											]))
+									])),
+								A2(
+								elm$html$Html$tbody,
+								_List_Nil,
+								author$project$Page$Home$tableBody(todos))
+							]))
 					])),
 				A2(
-				elm$html$Html$a,
+				elm$html$Html$div,
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$href('todos/new')
+						elm$html$Html$Attributes$class('col-12')
 					]),
 				_List_fromArray(
 					[
-						elm$html$Html$text('Create Todo')
+						A2(
+						elm$html$Html$a,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$href('todos/new')
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Create Todo')
+							]))
 					]))
 			]));
 };
