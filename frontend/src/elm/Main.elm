@@ -113,7 +113,7 @@ update msg model =
                 |> Tuple.mapSecond (Cmd.map HomePageMsg)
 
         ( NewTodoPageMsg formControlMsg, NewTodo currentTodo ) ->
-            NewTodoPage.update model.key formControlMsg currentTodo
+            NewTodoPage.update config formControlMsg currentTodo
                 |> Tuple.mapFirst (\newTodo -> { model | state = NewTodo newTodo })
                 |> Tuple.mapSecond (Cmd.map NewTodoPageMsg)
 

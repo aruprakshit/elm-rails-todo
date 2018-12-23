@@ -1,7 +1,7 @@
 module Page.Todos.New exposing (Msg(..), update, view)
 
 import Browser.Navigation as Nav
-import Config exposing (backendDomain)
+import Config exposing (AuthState(..), backendDomain)
 import Decoders.Todos exposing (todoDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, div, form, input, label, text, textarea)
@@ -22,8 +22,8 @@ type alias Model =
     Todo.Model
 
 
-update : Nav.Key -> Msg -> Model -> ( Model, Cmd Msg )
-update key msg model =
+update : Config.Model -> Msg -> Model -> ( Model, Cmd Msg )
+update config msg model =
     case msg of
         OnInputChange "title" value ->
             ( { model | title = value }, Cmd.none )
@@ -35,10 +35,10 @@ update key msg model =
             ( model, Cmd.none )
 
         CreateTodo ->
-            ( model, createTodo model )
+            ( model, createTodo config model )
 
         CreatedTodo response ->
-            ( model, Nav.pushUrl key "/" )
+            ( model, Nav.pushUrl config.key "/" )
 
 
 view : Model -> Html Msg
@@ -78,12 +78,27 @@ view model =
         ]
 
 
-createTodo : Model -> Cmd Msg
-createTodo formData =
-    Http.post
-        { url = backendDomain ++ UB.absolute [ "todos" ] []
+createTodo : Config.Model -> Model -> Cmd Msg
+createTodo config formData =
+    let
+        authToken =
+            case config.token of
+                Authenticated token ->
+                    token
+
+                NotAuthenticated ->
+                    ""
+    in
+    Http.request
+        { method = "GET"
+        , headers =
+            [ Http.header "Authorization" authToken
+            ]
+        , url = backendDomain ++ UB.absolute [ "todos" ] []
         , body = Http.jsonBody <| todoPayload formData
         , expect = Http.expectJson CreatedTodo todoDecoder
+        , timeout = Nothing
+        , tracker = Nothing
         }
 
 

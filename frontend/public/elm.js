@@ -7144,23 +7144,40 @@ var author$project$Page$Todos$New$todoPayload = function (formData) {
 				elm$json$Json$Encode$bool(formData.completed))
 			]));
 };
-var author$project$Page$Todos$New$createTodo = function (formData) {
-	return elm$http$Http$post(
-		{
-			body: elm$http$Http$jsonBody(
-				author$project$Page$Todos$New$todoPayload(formData)),
-			expect: A2(elm$http$Http$expectJson, author$project$Page$Todos$New$CreatedTodo, author$project$Decoders$Todos$todoDecoder),
-			url: _Utils_ap(
-				author$project$Config$backendDomain,
-				A2(
-					elm$url$Url$Builder$absolute,
-					_List_fromArray(
-						['todos']),
-					_List_Nil))
-		});
-};
+var author$project$Page$Todos$New$createTodo = F2(
+	function (config, formData) {
+		var authToken = function () {
+			var _n0 = config.token;
+			if (_n0.$ === 'Authenticated') {
+				var token = _n0.a;
+				return token;
+			} else {
+				return '';
+			}
+		}();
+		return elm$http$Http$request(
+			{
+				body: elm$http$Http$jsonBody(
+					author$project$Page$Todos$New$todoPayload(formData)),
+				expect: A2(elm$http$Http$expectJson, author$project$Page$Todos$New$CreatedTodo, author$project$Decoders$Todos$todoDecoder),
+				headers: _List_fromArray(
+					[
+						A2(elm$http$Http$header, 'Authorization', authToken)
+					]),
+				method: 'GET',
+				timeout: elm$core$Maybe$Nothing,
+				tracker: elm$core$Maybe$Nothing,
+				url: _Utils_ap(
+					author$project$Config$backendDomain,
+					A2(
+						elm$url$Url$Builder$absolute,
+						_List_fromArray(
+							['todos']),
+						_List_Nil))
+			});
+	});
 var author$project$Page$Todos$New$update = F3(
-	function (key, msg, model) {
+	function (config, msg, model) {
 		switch (msg.$) {
 			case 'OnInputChange':
 				switch (msg.a) {
@@ -7186,12 +7203,12 @@ var author$project$Page$Todos$New$update = F3(
 			case 'CreateTodo':
 				return _Utils_Tuple2(
 					model,
-					author$project$Page$Todos$New$createTodo(model));
+					A2(author$project$Page$Todos$New$createTodo, config, model));
 			default:
 				var response = msg.a;
 				return _Utils_Tuple2(
 					model,
-					A2(elm$browser$Browser$Navigation$pushUrl, key, '/'));
+					A2(elm$browser$Browser$Navigation$pushUrl, config.key, '/'));
 		}
 	});
 var elm$core$Platform$Cmd$map = _Platform_map;
@@ -7279,7 +7296,7 @@ var author$project$Main$update = F2(
 											state: author$project$Main$NewTodo(newTodo)
 										});
 								},
-								A3(author$project$Page$Todos$New$update, model.key, formControlMsg, currentTodo)));
+								A3(author$project$Page$Todos$New$update, config, formControlMsg, currentTodo)));
 					} else {
 						break _n0$8;
 					}
