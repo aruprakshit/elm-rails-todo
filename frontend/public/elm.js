@@ -4998,11 +4998,6 @@ var author$project$Decoders$Flags$decodeFlags = function (json) {
 		return elm$core$Maybe$Nothing;
 	}
 };
-var author$project$Entities$Signin$Model = F2(
-	function (email, password) {
-		return {email: email, password: password};
-	});
-var author$project$Entities$Signin$initialModel = A2(author$project$Entities$Signin$Model, '', '');
 var author$project$Entities$Todo$Model = F4(
 	function (title, content, completed, id) {
 		return {completed: completed, content: content, id: id, title: title};
@@ -5018,9 +5013,6 @@ var author$project$Main$NewTodo = function (a) {
 	return {$: 'NewTodo', a: a};
 };
 var author$project$Main$NoPageFound = {$: 'NoPageFound'};
-var author$project$Main$Session = function (a) {
-	return {$: 'Session', a: a};
-};
 var author$project$Main$ShowTodo = function (a) {
 	return {$: 'ShowTodo', a: a};
 };
@@ -6574,13 +6566,7 @@ var author$project$Main$getCurrentPageData = F2(
 						}),
 					A2(author$project$Main$fetchTodo, model, todoId));
 			case 'Login':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{
-							state: author$project$Main$Session(author$project$Entities$Signin$initialModel)
-						}),
-					elm$core$Platform$Cmd$none);
+				return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 			default:
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -6589,10 +6575,18 @@ var author$project$Main$getCurrentPageData = F2(
 					elm$core$Platform$Cmd$none);
 		}
 	});
+var author$project$Entities$Signin$Model = F2(
+	function (email, password) {
+		return {email: email, password: password};
+	});
+var author$project$Entities$Signin$initialModel = A2(author$project$Entities$Signin$Model, '', '');
 var author$project$Main$Model = F3(
 	function (key, state, authState) {
 		return {authState: authState, key: key, state: state};
 	});
+var author$project$Main$Session = function (a) {
+	return {$: 'Session', a: a};
+};
 var author$project$Main$initialModel = F2(
 	function (key, authState) {
 		return A3(
@@ -7211,6 +7205,7 @@ var author$project$Page$Todos$New$update = F3(
 					A2(elm$browser$Browser$Navigation$pushUrl, config.key, '/'));
 		}
 	});
+var author$project$Ports$clearAuthInfo = _Platform_outgoingPort('clearAuthInfo', elm$core$Basics$identity);
 var elm$core$Platform$Cmd$map = _Platform_map;
 var elm$core$Tuple$mapFirst = F2(
 	function (func, _n0) {
@@ -7228,11 +7223,12 @@ var elm$core$Tuple$mapSecond = F2(
 			x,
 			func(y));
 	});
+var elm$json$Json$Encode$null = _Json_encodeNull;
 var author$project$Main$update = F2(
 	function (msg, model) {
 		var config = A2(author$project$Config$Model, model.authState, model.key);
 		var _n0 = _Utils_Tuple2(msg, model.state);
-		_n0$8:
+		_n0$9:
 		while (true) {
 			switch (_n0.a.$) {
 				case 'EditTodoPageMsg':
@@ -7258,7 +7254,7 @@ var author$project$Main$update = F2(
 									editMsg,
 									A2(elm$core$Maybe$withDefault, author$project$Entities$Todo$initialModel, todo))));
 					} else {
-						break _n0$8;
+						break _n0$9;
 					}
 				case 'HomePageMsg':
 					if (_n0.b.$ === 'Home') {
@@ -7278,7 +7274,7 @@ var author$project$Main$update = F2(
 								},
 								A3(author$project$Page$Home$update, config, homeMsg, todos)));
 					} else {
-						break _n0$8;
+						break _n0$9;
 					}
 				case 'NewTodoPageMsg':
 					if (_n0.b.$ === 'NewTodo') {
@@ -7298,7 +7294,7 @@ var author$project$Main$update = F2(
 								},
 								A3(author$project$Page$Todos$New$update, config, formControlMsg, currentTodo)));
 					} else {
-						break _n0$8;
+						break _n0$9;
 					}
 				case 'SessionsPageMsg':
 					if (_n0.b.$ === 'Session') {
@@ -7318,7 +7314,7 @@ var author$project$Main$update = F2(
 								},
 								A3(author$project$Page$Auth$Sessions$update, model.key, formControlMsg, currentUser)));
 					} else {
-						break _n0$8;
+						break _n0$9;
 					}
 				case 'ActivatedLink':
 					var urlContainer = _n0.a.a;
@@ -7364,7 +7360,7 @@ var author$project$Main$update = F2(
 					} else {
 						return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 					}
-				default:
+				case 'GotTodos':
 					var response = _n0.a.a;
 					if (response.$ === 'Ok') {
 						var todos = response.a;
@@ -7378,10 +7374,34 @@ var author$project$Main$update = F2(
 					} else {
 						return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 					}
+				default:
+					var _n5 = _n0.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								authState: author$project$Config$NotAuthenticated,
+								state: author$project$Main$Session(author$project$Entities$Signin$initialModel)
+							}),
+						elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[
+									author$project$Ports$clearAuthInfo(elm$json$Json$Encode$null),
+									A2(
+									elm$browser$Browser$Navigation$pushUrl,
+									model.key,
+									A2(
+										elm$url$Url$Builder$absolute,
+										_List_fromArray(
+											['sign-in']),
+										_List_Nil))
+								])));
 			}
 		}
 		return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 	});
+var author$project$Main$LogOut = {$: 'LogOut'};
+var elm$core$Debug$log = _Debug_log;
 var elm$html$Html$a = _VirtualDom_node('a');
 var elm$html$Html$div = _VirtualDom_node('div');
 var elm$html$Html$nav = _VirtualDom_node('nav');
@@ -7401,46 +7421,74 @@ var elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
-var author$project$Main$navView = A2(
-	elm$html$Html$div,
-	_List_fromArray(
-		[
-			elm$html$Html$Attributes$class('container')
-		]),
-	_List_fromArray(
-		[
-			A2(
-			elm$html$Html$nav,
-			_List_fromArray(
-				[
-					elm$html$Html$Attributes$class('navbar navbar-light bg-light')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					elm$html$Html$a,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('navbar-brand'),
-							elm$html$Html$Attributes$href('/')
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text('Company Logo')
-						])),
-					A2(
-					elm$html$Html$a,
-					_List_fromArray(
-						[
-							elm$html$Html$Attributes$class('navbar-brand btn btn-info'),
-							elm$html$Html$Attributes$href('/')
-						]),
-					_List_fromArray(
-						[
-							elm$html$Html$text('Log out')
-						]))
-				]))
-		]));
+var elm$virtual_dom$VirtualDom$Normal = function (a) {
+	return {$: 'Normal', a: a};
+};
+var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
+var elm$html$Html$Events$on = F2(
+	function (event, decoder) {
+		return A2(
+			elm$virtual_dom$VirtualDom$on,
+			event,
+			elm$virtual_dom$VirtualDom$Normal(decoder));
+	});
+var elm$html$Html$Events$onClick = function (msg) {
+	return A2(
+		elm$html$Html$Events$on,
+		'click',
+		elm$json$Json$Decode$succeed(msg));
+};
+var author$project$Main$navView = function (model) {
+	var isLoggedIn = function () {
+		var _n0 = A2(elm$core$Debug$log, 'Log', model.authState);
+		if (_n0.$ === 'Authenticated') {
+			return true;
+		} else {
+			return false;
+		}
+	}();
+	return A2(
+		elm$html$Html$div,
+		_List_fromArray(
+			[
+				elm$html$Html$Attributes$class('container')
+			]),
+		_List_fromArray(
+			[
+				A2(
+				elm$html$Html$nav,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('navbar navbar-light bg-light')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$a,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('navbar-brand'),
+								elm$html$Html$Attributes$href('/')
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Company Logo')
+							])),
+						isLoggedIn ? A2(
+						elm$html$Html$a,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('navbar-brand btn btn-info'),
+								elm$html$Html$Attributes$href('#'),
+								elm$html$Html$Events$onClick(author$project$Main$LogOut)
+							]),
+						_List_fromArray(
+							[
+								elm$html$Html$text('Log out')
+							])) : elm$html$Html$text('')
+					]))
+			]));
+};
 var author$project$Page$Auth$Sessions$LogInRequested = {$: 'LogInRequested'};
 var author$project$Page$Auth$Sessions$OnInputChange = F2(
 	function (a, b) {
@@ -7462,7 +7510,6 @@ var elm$html$Html$Events$alwaysStop = function (x) {
 var elm$virtual_dom$VirtualDom$MayStopPropagation = function (a) {
 	return {$: 'MayStopPropagation', a: a};
 };
-var elm$virtual_dom$VirtualDom$on = _VirtualDom_on;
 var elm$html$Html$Events$stopPropagationOn = F2(
 	function (event, decoder) {
 		return A2(
@@ -7654,22 +7701,6 @@ var author$project$Page$Home$Delete = function (a) {
 };
 var elm$html$Html$td = _VirtualDom_node('td');
 var elm$html$Html$tr = _VirtualDom_node('tr');
-var elm$virtual_dom$VirtualDom$Normal = function (a) {
-	return {$: 'Normal', a: a};
-};
-var elm$html$Html$Events$on = F2(
-	function (event, decoder) {
-		return A2(
-			elm$virtual_dom$VirtualDom$on,
-			event,
-			elm$virtual_dom$VirtualDom$Normal(decoder));
-	});
-var elm$html$Html$Events$onClick = function (msg) {
-	return A2(
-		elm$html$Html$Events$on,
-		'click',
-		elm$json$Json$Decode$succeed(msg));
-};
 var author$project$Page$Home$tableBody = function (todos) {
 	return A2(
 		elm$core$List$map,
@@ -8408,14 +8439,15 @@ var author$project$Main$pageBody = function (_n0) {
 		_List_fromArray(
 			[body]));
 };
-var author$project$Main$pageTitle = function (state) {
-	switch (state.$) {
+var author$project$Main$pageTitle = function (model) {
+	var _n0 = model.state;
+	switch (_n0.$) {
 		case 'Home':
 			return 'Home Page';
 		case 'NewTodo':
 			return 'Create a todo item';
 		case 'ShowTodo':
-			var maybeTodo = state.a;
+			var maybeTodo = _n0.a;
 			if (maybeTodo.$ === 'Just') {
 				var todo = maybeTodo.a;
 				return todo.title;
@@ -8423,7 +8455,7 @@ var author$project$Main$pageTitle = function (state) {
 				return 'Loading';
 			}
 		case 'EditTodo':
-			var maybeTodo = state.a;
+			var maybeTodo = _n0.a;
 			if (maybeTodo.$ === 'Just') {
 				var todo = maybeTodo.a;
 				return todo.title;
@@ -8440,10 +8472,10 @@ var author$project$Main$view = function (model) {
 	return {
 		body: _List_fromArray(
 			[
-				author$project$Main$navView,
+				author$project$Main$navView(model),
 				author$project$Main$pageBody(model)
 			]),
-		title: author$project$Main$pageTitle(model.state)
+		title: author$project$Main$pageTitle(model)
 	};
 };
 var elm$browser$Browser$application = _Browser_application;

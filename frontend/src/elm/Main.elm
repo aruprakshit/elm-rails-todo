@@ -9,8 +9,10 @@ import Entities.Signin as Signin
 import Entities.Todo as Todo
 import Html exposing (Html, a, div, h1, nav, text)
 import Html.Attributes exposing (class, href)
+import Html.Events exposing (onClick)
 import Http
 import Json.Decode as JD
+import Json.Encode as JE
 import Navigation exposing (Route(..), toRoute)
 import Page.Auth.Sessions as SessionsPage
 import Page.Home as HomePage
@@ -18,6 +20,7 @@ import Page.NotFound as PageNotFound
 import Page.Todos.Edit as EditTodoPage
 import Page.Todos.New as NewTodoPage
 import Page.Todos.Show as ShowTodoPage
+import Ports exposing (clearAuthInfo)
 import Url exposing (Url)
 import Url.Builder as UB
 import Utils.Todo exposing (idToString)
@@ -61,6 +64,7 @@ type Msg
     | HomePageMsg HomePage.Msg
     | EditTodoPageMsg EditTodoPage.Msg
     | SessionsPageMsg SessionsPage.Msg
+    | LogOut
 
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
@@ -87,7 +91,7 @@ getCurrentPageData model url =
             )
 
         Login ->
-            ( { model | state = Session Signin.initialModel }, Cmd.none )
+            ( model, Cmd.none )
 
         NotFound ->
             ( { model | state = NoPageFound }
@@ -157,6 +161,14 @@ update msg model =
                 Err _ ->
                     ( model, Cmd.none )
 
+        ( LogOut, _ ) ->
+            ( { model | state = Session Signin.initialModel, authState = NotAuthenticated }
+            , Cmd.batch
+                [ clearAuthInfo JE.null
+                , Nav.pushUrl model.key (UB.absolute [ "sign-in" ] [])
+                ]
+            )
+
         ( _, _ ) ->
             -- Disregard messages that arrived for the wrong page.
             ( model, Cmd.none )
@@ -191,19 +203,32 @@ subscriptions _ =
 -- VIEW
 
 
-navView : Html msg
-navView =
+navView : Model -> Html Msg
+navView model =
+    let
+        isLoggedIn =
+            case Debug.log "Log" model.authState of
+                Authenticated _ ->
+                    True
+
+                NotAuthenticated ->
+                    False
+    in
     div [ class "container" ]
         [ nav [ class "navbar navbar-light bg-light" ]
             [ a [ class "navbar-brand", href "/" ] [ text "Company Logo" ]
-            , a [ class "navbar-brand btn btn-info", href "/" ] [ text "Log out" ]
+            , if isLoggedIn then
+                a [ class "navbar-brand btn btn-info", href "#", onClick LogOut ] [ text "Log out" ]
+
+              else
+                text ""
             ]
         ]
 
 
-pageTitle : State -> String
-pageTitle state =
-    case state of
+pageTitle : Model -> String
+pageTitle model =
+    case model.state of
         Home _ ->
             "Home Page"
 
@@ -268,9 +293,9 @@ pageBody { key, state } =
 
 view : Model -> Document Msg
 view model =
-    { title = pageTitle model.state
+    { title = pageTitle model
     , body =
-        [ navView
+        [ navView model
         , pageBody model
         ]
     }

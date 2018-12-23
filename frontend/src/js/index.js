@@ -9,4 +9,8 @@ document.addEventListener('DOMContentLoaded', function (event) {
   app.ports.storeAuthInfo.subscribe(function(auth) {
     Cookies.set('appAuthToken', auth, { expires: 7 });
   });
+
+  app.ports.clearAuthInfo.subscribe(function(data) {
+    Cookies.remove('appAuthToken');
+  });
 })
