@@ -4,7 +4,7 @@ import Browser.Navigation as Nav
 import Config exposing (AuthState(..), backendDomain)
 import Decoders.Todos exposing (todoDecoder)
 import Entities.Todo as Todo
-import Html exposing (Html, a, button, div, form, input, label, text, textarea)
+import Html exposing (Html, a, button, div, form, h1, input, label, text, textarea)
 import Html.Attributes exposing (class, href, placeholder, style, type_, value)
 import Html.Events exposing (onInput, onSubmit)
 import Http
@@ -45,7 +45,9 @@ view : Model -> List (Html Msg)
 view model =
     [ div [ class "row" ]
         [ div [ class "col-12" ]
-            [ form [ onSubmit CreateTodo ]
+            [ h1 [] [ text "Create a new todo" ]
+            , form
+                [ onSubmit CreateTodo ]
                 [ div [ class "form-group" ]
                     [ label [] [ text "Title:" ]
                     , input
