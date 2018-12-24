@@ -14,35 +14,40 @@ type alias Model =
 todoView : Todo.Model -> Html msg
 todoView todo =
     div []
-        [ h1 [] [ text <| "Viewing Todo #" ++ idToString todo.id ]
-        , div []
-            [ p []
-                [ strong [] [ text "Title:  " ]
-                , text todo.title
-                ]
-            ]
-        , div []
-            [ p []
-                [ strong [] [ text "Content:  " ]
-                , text (Maybe.withDefault "" todo.content)
-                ]
-            ]
-        , div []
-            [ p []
-                [ strong [] [ text "Status:  " ]
-                , text
-                    (if todo.completed then
-                        "Finished"
+        [ div [ class "row" ]
+            [ div [ class "col-12" ]
+                [ h1 [] [ text <| "Viewing Todo #" ++ idToString todo.id ]
+                , div []
+                    [ p []
+                        [ strong [] [ text "Title:  " ]
+                        , text todo.title
+                        ]
+                    ]
+                , div []
+                    [ p []
+                        [ strong [] [ text "Content:  " ]
+                        , text (Maybe.withDefault "" todo.content)
+                        ]
+                    ]
+                , div []
+                    [ p []
+                        [ strong [] [ text "Status:  " ]
+                        , text
+                            (if todo.completed then
+                                "Finished"
 
-                     else
-                        "Not Finished"
-                    )
+                             else
+                                "Not Finished"
+                            )
+                        ]
+                    ]
                 ]
             ]
-        , div [ class "links" ]
-            [ a [ href "/" ] [ text "Back home" ]
-            , span [ class "divider" ] []
-            , a [ href (UB.absolute [ "todos", idToString todo.id, "edit" ] []) ] [ text "Edit" ]
+        , div [ class "card mt-4" ]
+            [ div [ class "card-body d-flex" ]
+                [ a [ href "/", class "btn btn-primary" ] [ text "Back home" ]
+                , a [ class "btn btn-primary ml-auto", href (UB.absolute [ "todos", idToString todo.id, "edit" ] []) ] [ text "Edit" ]
+                ]
             ]
         ]
 

@@ -8282,7 +8282,6 @@ var author$project$Page$Todos$New$view = function (model) {
 					]))
 			]));
 };
-var elm$html$Html$span = _VirtualDom_node('span');
 var elm$html$Html$strong = _VirtualDom_node('strong');
 var author$project$Page$Todos$Show$todoView = function (todo) {
 	return A2(
@@ -8291,118 +8290,140 @@ var author$project$Page$Todos$Show$todoView = function (todo) {
 		_List_fromArray(
 			[
 				A2(
-				elm$html$Html$h1,
-				_List_Nil,
-				_List_fromArray(
-					[
-						elm$html$Html$text(
-						'Viewing Todo #' + author$project$Utils$Todo$idToString(todo.id))
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								elm$html$Html$strong,
-								_List_Nil,
-								_List_fromArray(
-									[
-										elm$html$Html$text('Title:  ')
-									])),
-								elm$html$Html$text(todo.title)
-							]))
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								elm$html$Html$strong,
-								_List_Nil,
-								_List_fromArray(
-									[
-										elm$html$Html$text('Content:  ')
-									])),
-								elm$html$Html$text(
-								A2(elm$core$Maybe$withDefault, '', todo.content))
-							]))
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_Nil,
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$p,
-						_List_Nil,
-						_List_fromArray(
-							[
-								A2(
-								elm$html$Html$strong,
-								_List_Nil,
-								_List_fromArray(
-									[
-										elm$html$Html$text('Status:  ')
-									])),
-								elm$html$Html$text(
-								todo.completed ? 'Finished' : 'Not Finished')
-							]))
-					])),
-				A2(
 				elm$html$Html$div,
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$class('links')
+						elm$html$Html$Attributes$class('row')
 					]),
 				_List_fromArray(
 					[
 						A2(
-						elm$html$Html$a,
+						elm$html$Html$div,
 						_List_fromArray(
 							[
-								elm$html$Html$Attributes$href('/')
+								elm$html$Html$Attributes$class('col-12')
 							]),
 						_List_fromArray(
 							[
-								elm$html$Html$text('Back home')
-							])),
-						A2(
-						elm$html$Html$span,
-						_List_fromArray(
-							[
-								elm$html$Html$Attributes$class('divider')
-							]),
-						_List_Nil),
-						A2(
-						elm$html$Html$a,
-						_List_fromArray(
-							[
-								elm$html$Html$Attributes$href(
 								A2(
-									elm$url$Url$Builder$absolute,
-									_List_fromArray(
-										[
-											'todos',
-											author$project$Utils$Todo$idToString(todo.id),
-											'edit'
-										]),
-									_List_Nil))
+								elm$html$Html$h1,
+								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$text(
+										'Viewing Todo #' + author$project$Utils$Todo$idToString(todo.id))
+									])),
+								A2(
+								elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										elm$html$Html$p,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												elm$html$Html$strong,
+												_List_Nil,
+												_List_fromArray(
+													[
+														elm$html$Html$text('Title:  ')
+													])),
+												elm$html$Html$text(todo.title)
+											]))
+									])),
+								A2(
+								elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										elm$html$Html$p,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												elm$html$Html$strong,
+												_List_Nil,
+												_List_fromArray(
+													[
+														elm$html$Html$text('Content:  ')
+													])),
+												elm$html$Html$text(
+												A2(elm$core$Maybe$withDefault, '', todo.content))
+											]))
+									])),
+								A2(
+								elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										elm$html$Html$p,
+										_List_Nil,
+										_List_fromArray(
+											[
+												A2(
+												elm$html$Html$strong,
+												_List_Nil,
+												_List_fromArray(
+													[
+														elm$html$Html$text('Status:  ')
+													])),
+												elm$html$Html$text(
+												todo.completed ? 'Finished' : 'Not Finished')
+											]))
+									]))
+							]))
+					])),
+				A2(
+				elm$html$Html$div,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('card mt-4')
+					]),
+				_List_fromArray(
+					[
+						A2(
+						elm$html$Html$div,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('card-body d-flex')
 							]),
 						_List_fromArray(
 							[
-								elm$html$Html$text('Edit')
+								A2(
+								elm$html$Html$a,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$href('/'),
+										elm$html$Html$Attributes$class('btn btn-primary')
+									]),
+								_List_fromArray(
+									[
+										elm$html$Html$text('Back home')
+									])),
+								A2(
+								elm$html$Html$a,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$class('btn btn-primary ml-auto'),
+										elm$html$Html$Attributes$href(
+										A2(
+											elm$url$Url$Builder$absolute,
+											_List_fromArray(
+												[
+													'todos',
+													author$project$Utils$Todo$idToString(todo.id),
+													'edit'
+												]),
+											_List_Nil))
+									]),
+								_List_fromArray(
+									[
+										elm$html$Html$text('Edit')
+									]))
 							]))
 					]))
 			]));
