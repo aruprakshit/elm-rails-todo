@@ -273,10 +273,8 @@ pageBody { key, state } =
                         |> List.map (\msg -> Html.map HomePageMsg msg)
 
                 NewTodo todo ->
-                    (NewTodoPage.view todo
-                        |> Html.map NewTodoPageMsg
-                    )
-                        :: []
+                    NewTodoPage.view todo
+                        |> List.map (\msg -> Html.map NewTodoPageMsg msg)
 
                 ShowTodo todo ->
                     ShowTodoPage.view todo :: []
