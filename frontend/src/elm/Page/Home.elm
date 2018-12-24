@@ -88,7 +88,7 @@ view model =
 
 tableFilter : Html Msg
 tableFilter =
-    select [ onInput ChangeFilter ]
+    select [ class "form-control", onInput ChangeFilter ]
         [ option [ value "1" ] [ text "All" ]
         , option [ value "2" ] [ text "Completed" ]
         , option [ value "3" ] [ text "Not Completed" ]

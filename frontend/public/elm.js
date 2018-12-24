@@ -7780,6 +7780,7 @@ var author$project$Page$Home$tableFilter = A2(
 	elm$html$Html$select,
 	_List_fromArray(
 		[
+			elm$html$Html$Attributes$class('form-control'),
 			elm$html$Html$Events$onInput(author$project$Page$Home$ChangeFilter)
 		]),
 	_List_fromArray(
