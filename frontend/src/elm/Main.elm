@@ -8,7 +8,7 @@ import Decoders.Todos exposing (todoDecoder, todosListDecoder)
 import Entities.Signin as Signin
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, div, h1, nav, text)
-import Html.Attributes exposing (class, href)
+import Html.Attributes exposing (class, href, style)
 import Html.Events exposing (onClick)
 import Http
 import Json.Decode as JD
@@ -216,7 +216,10 @@ navView model =
                 NotAuthenticated ->
                     False
     in
-    div [ class "container" ]
+    div
+        [ class "container"
+        , style "margin-bottom" "2rem"
+        ]
         [ nav [ class "navbar navbar-light bg-light" ]
             [ a [ class "navbar-brand", href "/" ] [ text "Company Logo" ]
             , if isLoggedIn then
@@ -266,31 +269,39 @@ pageBody { key, state } =
         body =
             case state of
                 Home todos ->
-                    HomePage.view todos |> Html.map HomePageMsg
+                    HomePage.view todos
+                        |> List.map (\msg -> Html.map HomePageMsg msg)
 
                 NewTodo todo ->
-                    NewTodoPage.view todo |> Html.map NewTodoPageMsg
+                    (NewTodoPage.view todo
+                        |> Html.map NewTodoPageMsg
+                    )
+                        :: []
 
                 ShowTodo todo ->
-                    ShowTodoPage.view todo
+                    ShowTodoPage.view todo :: []
 
                 EditTodo todo ->
                     case todo of
                         Just formData ->
-                            EditTodoPage.view formData |> Html.map EditTodoPageMsg
+                            (EditTodoPage.view formData
+                                |> Html.map EditTodoPageMsg
+                            )
+                                :: []
 
                         Nothing ->
-                            text "Loading"
+                            text "Loading" :: []
 
                 Session user ->
-                    SessionsPage.view user |> Html.map SessionsPageMsg
+                    (SessionsPage.view user
+                        |> Html.map SessionsPageMsg
+                    )
+                        :: []
 
                 NoPageFound ->
-                    PageNotFound.view
+                    PageNotFound.view :: []
     in
-    div [ class "container" ]
-        [ body
-        ]
+    div [ class "container" ] body
 
 
 view : Model -> Document Msg

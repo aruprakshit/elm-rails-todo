@@ -7424,6 +7424,8 @@ var elm$html$Html$Attributes$href = function (url) {
 		'href',
 		_VirtualDom_noJavaScriptUri(url));
 };
+var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
+var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -7454,7 +7456,8 @@ var author$project$Main$navView = function (model) {
 		elm$html$Html$div,
 		_List_fromArray(
 			[
-				elm$html$Html$Attributes$class('container')
+				elm$html$Html$Attributes$class('container'),
+				A2(elm$html$Html$Attributes$style, 'margin-bottom', '2rem')
 			]),
 		_List_fromArray(
 			[
@@ -7501,8 +7504,6 @@ var elm$html$Html$input = _VirtualDom_node('input');
 var elm$html$Html$label = _VirtualDom_node('label');
 var elm$html$Html$Attributes$for = elm$html$Html$Attributes$stringProperty('htmlFor');
 var elm$html$Html$Attributes$id = elm$html$Html$Attributes$stringProperty('id');
-var elm$virtual_dom$VirtualDom$style = _VirtualDom_style;
-var elm$html$Html$Attributes$style = elm$virtual_dom$VirtualDom$style;
 var elm$html$Html$Attributes$type_ = elm$html$Html$Attributes$stringProperty('type');
 var elm$html$Html$Attributes$value = elm$html$Html$Attributes$stringProperty('value');
 var elm$html$Html$Events$alwaysStop = function (x) {
@@ -7814,13 +7815,12 @@ var author$project$Page$Home$tableFilter = A2(
 					elm$html$Html$text('Not Completed')
 				]))
 		]));
-var elm$html$Html$caption = _VirtualDom_node('caption');
 var elm$html$Html$table = _VirtualDom_node('table');
 var elm$html$Html$tbody = _VirtualDom_node('tbody');
 var elm$html$Html$th = _VirtualDom_node('th');
 var elm$html$Html$thead = _VirtualDom_node('thead');
 var elm$html$Html$Attributes$scope = elm$html$Html$Attributes$stringProperty('scope');
-var author$project$Page$Home$view = function (todos) {
+var author$project$Page$Home$tableView = function (model) {
 	return A2(
 		elm$html$Html$div,
 		_List_fromArray(
@@ -7845,13 +7845,6 @@ var author$project$Page$Home$view = function (todos) {
 							]),
 						_List_fromArray(
 							[
-								A2(
-								elm$html$Html$caption,
-								_List_Nil,
-								_List_fromArray(
-									[
-										elm$html$Html$text('All Todos')
-									])),
 								A2(
 								elm$html$Html$thead,
 								_List_Nil,
@@ -7905,29 +7898,45 @@ var author$project$Page$Home$view = function (todos) {
 								A2(
 								elm$html$Html$tbody,
 								_List_Nil,
-								author$project$Page$Home$tableBody(todos))
-							]))
-					])),
-				A2(
-				elm$html$Html$div,
-				_List_fromArray(
-					[
-						elm$html$Html$Attributes$class('col-12')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						elm$html$Html$a,
-						_List_fromArray(
-							[
-								elm$html$Html$Attributes$href('todos/new')
-							]),
-						_List_fromArray(
-							[
-								elm$html$Html$text('Create Todo')
+								author$project$Page$Home$tableBody(model))
 							]))
 					]))
 			]));
+};
+var author$project$Page$Home$view = function (model) {
+	return _List_fromArray(
+		[
+			A2(
+			elm$html$Html$div,
+			_List_fromArray(
+				[
+					elm$html$Html$Attributes$class('card mb-4')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					elm$html$Html$div,
+					_List_fromArray(
+						[
+							elm$html$Html$Attributes$class('card-body')
+						]),
+					_List_fromArray(
+						[
+							A2(
+							elm$html$Html$a,
+							_List_fromArray(
+								[
+									elm$html$Html$Attributes$href('todos/new'),
+									elm$html$Html$Attributes$class('btn btn-primary')
+								]),
+							_List_fromArray(
+								[
+									elm$html$Html$text('Create Todo')
+								]))
+						]))
+				])),
+			author$project$Page$Home$tableView(model)
+		]);
 };
 var elm$html$Html$h1 = _VirtualDom_node('h1');
 var elm$html$Html$h2 = _VirtualDom_node('h2');
@@ -8398,37 +8407,54 @@ var author$project$Main$pageBody = function (_n0) {
 			case 'Home':
 				var todos = state.a;
 				return A2(
-					elm$html$Html$map,
-					author$project$Main$HomePageMsg,
+					elm$core$List$map,
+					function (msg) {
+						return A2(elm$html$Html$map, author$project$Main$HomePageMsg, msg);
+					},
 					author$project$Page$Home$view(todos));
 			case 'NewTodo':
 				var todo = state.a;
 				return A2(
-					elm$html$Html$map,
-					author$project$Main$NewTodoPageMsg,
-					author$project$Page$Todos$New$view(todo));
+					elm$core$List$cons,
+					A2(
+						elm$html$Html$map,
+						author$project$Main$NewTodoPageMsg,
+						author$project$Page$Todos$New$view(todo)),
+					_List_Nil);
 			case 'ShowTodo':
 				var todo = state.a;
-				return author$project$Page$Todos$Show$view(todo);
+				return A2(
+					elm$core$List$cons,
+					author$project$Page$Todos$Show$view(todo),
+					_List_Nil);
 			case 'EditTodo':
 				var todo = state.a;
 				if (todo.$ === 'Just') {
 					var formData = todo.a;
 					return A2(
-						elm$html$Html$map,
-						author$project$Main$EditTodoPageMsg,
-						author$project$Page$Todos$Edit$view(formData));
+						elm$core$List$cons,
+						A2(
+							elm$html$Html$map,
+							author$project$Main$EditTodoPageMsg,
+							author$project$Page$Todos$Edit$view(formData)),
+						_List_Nil);
 				} else {
-					return elm$html$Html$text('Loading');
+					return A2(
+						elm$core$List$cons,
+						elm$html$Html$text('Loading'),
+						_List_Nil);
 				}
 			case 'Session':
 				var user = state.a;
 				return A2(
-					elm$html$Html$map,
-					author$project$Main$SessionsPageMsg,
-					author$project$Page$Auth$Sessions$view(user));
+					elm$core$List$cons,
+					A2(
+						elm$html$Html$map,
+						author$project$Main$SessionsPageMsg,
+						author$project$Page$Auth$Sessions$view(user)),
+					_List_Nil);
 			default:
-				return author$project$Page$NotFound$view;
+				return A2(elm$core$List$cons, author$project$Page$NotFound$view, _List_Nil);
 		}
 	}();
 	return A2(
@@ -8437,8 +8463,7 @@ var author$project$Main$pageBody = function (_n0) {
 			[
 				elm$html$Html$Attributes$class('container')
 			]),
-		_List_fromArray(
-			[body]));
+		body);
 };
 var author$project$Main$pageTitle = function (model) {
 	var _n0 = model.state;

@@ -56,13 +56,12 @@ update config msg model =
                     ( model, Cmd.none )
 
 
-view : Model -> Html Msg
-view todos =
+tableView : Model -> Html Msg
+tableView model =
     div [ class "row" ]
         [ div [ class "col-12" ]
             [ table [ class "table table-striped" ]
-                [ caption [] [ text "All Todos" ]
-                , thead []
+                [ thead []
                     [ tr []
                         [ th [ scope "col" ] [ text "Title" ]
                         , th [ scope "col" ] [ text "Content" ]
@@ -70,13 +69,21 @@ view todos =
                         , th [ scope "col" ] [ tableFilter ]
                         ]
                     ]
-                , tbody [] (tableBody todos)
+                , tbody [] (tableBody model)
                 ]
             ]
-        , div [ class "col-12" ]
-            [ a [ href "todos/new" ] [ text "Create Todo" ]
+        ]
+
+
+view : Model -> List (Html Msg)
+view model =
+    [ div [ class "card mb-4" ]
+        [ div [ class "card-body" ]
+            [ a [ href "todos/new", class "btn btn-primary" ] [ text "Create Todo" ]
             ]
         ]
+    , tableView model
+    ]
 
 
 tableFilter : Html Msg
