@@ -69,7 +69,7 @@ type Msg
 
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
 getCurrentPageData model url =
-    case toRoute <| Debug.log "URL" (Url.toString url) of
+    case toRoute <| Url.toString url of
         Index ->
             ( { model | state = Home [] }
             , fetchTodos model
@@ -122,9 +122,11 @@ update msg model =
                 |> Tuple.mapSecond (Cmd.map NewTodoPageMsg)
 
         ( SessionsPageMsg formControlMsg, Session currentUser ) ->
-            SessionsPage.update model.key formControlMsg currentUser
-                |> Tuple.mapFirst (\user -> { model | state = Session user })
-                |> Tuple.mapSecond (Cmd.map SessionsPageMsg)
+            let
+                ( formData, cmd, authState ) =
+                    SessionsPage.update model.key formControlMsg currentUser
+            in
+            ( { model | state = Session formData, authState = authState }, Cmd.map SessionsPageMsg cmd )
 
         ( ActivatedLink urlContainer, _ ) ->
             case urlContainer of
@@ -206,9 +208,6 @@ subscriptions _ =
 navView : Model -> Html Msg
 navView model =
     let
-        logModel =
-            Debug.log "Model" model
-
         isLoggedIn =
             case model.authState of
                 Authenticated _ ->

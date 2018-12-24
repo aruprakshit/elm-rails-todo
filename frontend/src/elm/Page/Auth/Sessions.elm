@@ -1,7 +1,7 @@
 module Page.Auth.Sessions exposing (Model, Msg(..), update, view)
 
 import Browser.Navigation as Nav
-import Config exposing (backendDomain)
+import Config exposing (AuthState(..), backendDomain)
 import Decoders.Auth exposing (authDecoder)
 import Entities.Signin as Signin
 import Html exposing (Html, a, button, div, form, input, label, text)
@@ -23,20 +23,20 @@ type alias Model =
     Signin.Model
 
 
-update : Nav.Key -> Msg -> Model -> ( Model, Cmd Msg )
+update : Nav.Key -> Msg -> Model -> ( Model, Cmd Msg, AuthState )
 update key msg model =
     case msg of
         OnInputChange "email" value ->
-            ( { model | email = value }, Cmd.none )
+            ( { model | email = value }, Cmd.none, NotAuthenticated )
 
         OnInputChange "password" value ->
-            ( { model | password = value }, Cmd.none )
+            ( { model | password = value }, Cmd.none, NotAuthenticated )
 
         OnInputChange _ _ ->
-            ( model, Cmd.none )
+            ( model, Cmd.none, NotAuthenticated )
 
         LogInRequested ->
-            ( model, singIn model )
+            ( model, singIn model, NotAuthenticated )
 
         LoginCompleted response ->
             case response of
@@ -46,10 +46,11 @@ update key msg model =
                         [ storeAuthInfo <| JE.string authData.authToken
                         , Nav.pushUrl key "/"
                         ]
+                    , Authenticated authData.authToken
                     )
 
                 Err _ ->
-                    ( model, Cmd.none )
+                    ( model, Cmd.none, NotAuthenticated )
 
 
 view : Model -> Html Msg

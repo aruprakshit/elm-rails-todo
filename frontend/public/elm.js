@@ -6480,7 +6480,6 @@ var author$project$Navigation$toRoute = function (url) {
 			A2(elm$url$Url$Parser$parse, author$project$Navigation$route, uri));
 	}
 };
-var elm$core$Debug$log = _Debug_log;
 var elm$core$Platform$Cmd$batch = _Platform_batch;
 var elm$core$Platform$Cmd$none = elm$core$Platform$Cmd$batch(_List_Nil);
 var elm$url$Url$addPort = F2(
@@ -6530,10 +6529,7 @@ var elm$url$Url$toString = function (url) {
 var author$project$Main$getCurrentPageData = F2(
 	function (model, url) {
 		var _n0 = author$project$Navigation$toRoute(
-			A2(
-				elm$core$Debug$log,
-				'URL',
-				elm$url$Url$toString(url)));
+			elm$url$Url$toString(url));
 		switch (_n0.$) {
 			case 'Index':
 				return _Utils_Tuple2(
@@ -6800,30 +6796,33 @@ var author$project$Page$Auth$Sessions$update = F3(
 				switch (msg.a) {
 					case 'email':
 						var value = msg.b;
-						return _Utils_Tuple2(
+						return _Utils_Tuple3(
 							_Utils_update(
 								model,
 								{email: value}),
-							elm$core$Platform$Cmd$none);
+							elm$core$Platform$Cmd$none,
+							author$project$Config$NotAuthenticated);
 					case 'password':
 						var value = msg.b;
-						return _Utils_Tuple2(
+						return _Utils_Tuple3(
 							_Utils_update(
 								model,
 								{password: value}),
-							elm$core$Platform$Cmd$none);
+							elm$core$Platform$Cmd$none,
+							author$project$Config$NotAuthenticated);
 					default:
-						return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+						return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, author$project$Config$NotAuthenticated);
 				}
 			case 'LogInRequested':
-				return _Utils_Tuple2(
+				return _Utils_Tuple3(
 					model,
-					author$project$Page$Auth$Sessions$singIn(model));
+					author$project$Page$Auth$Sessions$singIn(model),
+					author$project$Config$NotAuthenticated);
 			default:
 				var response = msg.a;
 				if (response.$ === 'Ok') {
 					var authData = response.a;
-					return _Utils_Tuple2(
+					return _Utils_Tuple3(
 						model,
 						elm$core$Platform$Cmd$batch(
 							_List_fromArray(
@@ -6831,9 +6830,10 @@ var author$project$Page$Auth$Sessions$update = F3(
 									author$project$Ports$storeAuthInfo(
 									elm$json$Json$Encode$string(authData.authToken)),
 									A2(elm$browser$Browser$Navigation$pushUrl, key, '/')
-								])));
+								])),
+						author$project$Config$Authenticated(authData.authToken));
 				} else {
-					return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
+					return _Utils_Tuple3(model, elm$core$Platform$Cmd$none, author$project$Config$NotAuthenticated);
 				}
 		}
 	});
@@ -7304,19 +7304,18 @@ var author$project$Main$update = F2(
 					if (_n0.b.$ === 'Session') {
 						var formControlMsg = _n0.a.a;
 						var currentUser = _n0.b.a;
-						return A2(
-							elm$core$Tuple$mapSecond,
-							elm$core$Platform$Cmd$map(author$project$Main$SessionsPageMsg),
-							A2(
-								elm$core$Tuple$mapFirst,
-								function (user) {
-									return _Utils_update(
-										model,
-										{
-											state: author$project$Main$Session(user)
-										});
-								},
-								A3(author$project$Page$Auth$Sessions$update, model.key, formControlMsg, currentUser)));
+						var _n1 = A3(author$project$Page$Auth$Sessions$update, model.key, formControlMsg, currentUser);
+						var formData = _n1.a;
+						var cmd = _n1.b;
+						var authState = _n1.c;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									authState: authState,
+									state: author$project$Main$Session(formData)
+								}),
+							A2(elm$core$Platform$Cmd$map, author$project$Main$SessionsPageMsg, cmd));
 					} else {
 						break _n0$9;
 					}
@@ -7338,8 +7337,8 @@ var author$project$Main$update = F2(
 					var response = _n0.a.a;
 					if (response.$ === 'Ok') {
 						var todo = response.a;
-						var _n3 = model.state;
-						switch (_n3.$) {
+						var _n4 = model.state;
+						switch (_n4.$) {
 							case 'ShowTodo':
 								return _Utils_Tuple2(
 									_Utils_update(
@@ -7379,7 +7378,7 @@ var author$project$Main$update = F2(
 						return _Utils_Tuple2(model, elm$core$Platform$Cmd$none);
 					}
 				default:
-					var _n5 = _n0.a;
+					var _n6 = _n0.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -7443,7 +7442,6 @@ var elm$html$Html$Events$onClick = function (msg) {
 		elm$json$Json$Decode$succeed(msg));
 };
 var author$project$Main$navView = function (model) {
-	var logModel = A2(elm$core$Debug$log, 'Model', model);
 	var isLoggedIn = function () {
 		var _n0 = model.authState;
 		if (_n0.$ === 'Authenticated') {
