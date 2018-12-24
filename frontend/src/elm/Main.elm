@@ -282,10 +282,8 @@ pageBody { key, state } =
                 EditTodo todo ->
                     case todo of
                         Just formData ->
-                            (EditTodoPage.view formData
-                                |> Html.map EditTodoPageMsg
-                            )
-                                :: []
+                            EditTodoPage.view formData
+                                |> List.map (\msg -> Html.map EditTodoPageMsg msg)
 
                         Nothing ->
                             text "Loading" :: []

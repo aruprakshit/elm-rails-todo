@@ -5,7 +5,7 @@ import Config exposing (AuthState(..), backendDomain)
 import Decoders.Todos exposing (todoDecoder)
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, div, form, h1, input, label, text, textarea)
-import Html.Attributes exposing (checked, href, placeholder, style, type_, value)
+import Html.Attributes exposing (checked, class, href, placeholder, style, type_, value)
 import Html.Events exposing (onCheck, onInput, onSubmit)
 import Http
 import Json.Encode as JE
@@ -49,54 +49,55 @@ update config msg model =
             ( model, Nav.pushUrl config.key (UB.absolute [ "todos", idToString model.id ] []) )
 
 
-view : Model -> Html Msg
+view : Model -> List (Html Msg)
 view model =
-    div []
-        [ h1 [] [ text <| "Editing Todo #" ++ idToString model.id ]
-        , form [ onSubmit UpdateTodo ]
-            [ div [ style "margin-bottom" "10px" ]
-                [ label []
-                    [ text "Title:"
+    [ div [ class "row" ]
+        [ div [ class "col-12" ]
+            [ h1 [] [ text <| "Editing Todo #" ++ idToString model.id ]
+            , form [ onSubmit UpdateTodo ]
+                [ div [ class "form-group" ]
+                    [ label [] [ text "Title:" ]
                     , input
                         [ type_ "text"
                         , placeholder "Title"
-                        , style "margin-left" "10px"
+                        , class "form-control col-4"
                         , value model.title
                         , onInput (OnInputChange "title")
                         ]
                         []
                     ]
-                ]
-            , div [ style "margin-bottom" "10px" ]
-                [ label []
-                    [ text "Content:"
+                , div [ class "form-group" ]
+                    [ label [] [ text "Content:" ]
                     , textarea
                         [ placeholder "Content"
-                        , style "margin-left" "10px"
+                        , class "form-control"
                         , value (Maybe.withDefault "" model.content)
                         , onInput (OnInputChange "content")
                         ]
                         []
                     ]
-                ]
-            , div [ style "margin-bottom" "10px" ]
-                [ label []
-                    [ text "Completed?"
-                    , input
+                , div [ class "form-group form-check" ]
+                    [ input
                         [ type_ "checkbox"
-                        , style "margin-left" "10px"
+                        , class "form-check-input"
                         , checked model.completed
                         , onCheck (OnCheckChange "completed")
                         ]
                         []
+                    , label [ class "form-check-label" ] [ text "Completed?" ]
+                    ]
+                , div []
+                    [ button [ class "btn btn-primary" ] [ text "Save" ]
                     ]
                 ]
-            , div []
-                [ button [] [ text "Save" ]
-                ]
             ]
-        , a [ href "/" ] [ text "Back home" ]
         ]
+    , div [ class "card mt-4" ]
+        [ div [ class "card-body d-flex" ]
+            [ a [ href "/", class "btn btn-primary" ] [ text "Back home" ]
+            ]
+        ]
+    ]
 
 
 updateTodo : Config.Model -> Model -> Cmd Msg
