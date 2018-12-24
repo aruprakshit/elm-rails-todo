@@ -71,9 +71,18 @@ getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
 getCurrentPageData model url =
     case toRoute <| Url.toString url of
         Index ->
-            ( { model | state = Home [] }
-            , fetchTodos model
-            )
+            case model.authState of
+                Authenticated authToken ->
+                    ( { model | state = Home [] }
+                    , fetchTodos model
+                    )
+
+                NotAuthenticated ->
+                    ( { model
+                        | state = Session Signin.initialModel
+                      }
+                    , Nav.pushUrl model.key (UB.absolute [ "sign-in" ] [])
+                    )
 
         New ->
             ( { model | state = NewTodo Todo.initialModel }
