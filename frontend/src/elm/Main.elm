@@ -223,7 +223,7 @@ navView model =
         [ nav [ class "navbar navbar-light bg-light" ]
             [ a [ class "navbar-brand", href "/" ] [ text "Company Logo" ]
             , if isLoggedIn then
-                button [ class "navbar-brand btn btn-info", onClick LogOut ] [ text "Log out" ]
+                button [ class "navbar-brand btn btn-info text-white", onClick LogOut ] [ text "Log out" ]
 
               else
                 text ""

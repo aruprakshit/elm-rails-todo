@@ -61,12 +61,12 @@ tableView model =
     div [ class "row" ]
         [ div [ class "col-12" ]
             [ table [ class "table table-striped" ]
-                [ thead []
-                    [ tr []
-                        [ th [ scope "col" ] [ text "Title" ]
-                        , th [ scope "col" ] [ text "Content" ]
-                        , th [ scope "col" ] [ text "Completed?" ]
-                        , th [ scope "col" ] [ tableFilter ]
+                [ thead [ class "thead-dark" ]
+                    [ tr [ class "d-flex" ]
+                        [ th [ class "col-3 text-center" ] [ text "Title" ]
+                        , th [ class "col-5 text-center" ] [ text "Content" ]
+                        , th [ class "col-2 text-center" ] [ text "Completed?" ]
+                        , th [ class "col-2 text-center" ] [ tableFilter ]
                         ]
                     ]
                 , tbody [] (tableBody model)
@@ -99,10 +99,10 @@ tableBody : Model -> List (Html Msg)
 tableBody todos =
     List.map
         (\todo ->
-            tr []
-                [ td [] [ text todo.title ]
-                , td [] [ text (Maybe.withDefault "-" todo.content) ]
-                , td []
+            tr [ class "d-flex" ]
+                [ td [ class "col-3" ] [ text todo.title ]
+                , td [ class "col-5" ] [ text (Maybe.withDefault "-" todo.content) ]
+                , td [ class "col-2" ]
                     [ text
                         (if todo.completed then
                             "✓"
@@ -111,7 +111,7 @@ tableBody todos =
                             "˟"
                         )
                     ]
-                , td []
+                , td [ class "col-2 justify-content-between d-flex align-items-center" ]
                     [ a [ href ("todos/" ++ idToString todo.id), class "btn btn-sm btn-primary" ] [ text "Show" ]
                     , button [ type_ "button", onClick (Delete (idToString todo.id)), class "btn btn-sm btn-danger" ] [ text "Delete" ]
                     ]

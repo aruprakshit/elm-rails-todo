@@ -7484,7 +7484,7 @@ var author$project$Main$navView = function (model) {
 						elm$html$Html$button,
 						_List_fromArray(
 							[
-								elm$html$Html$Attributes$class('navbar-brand btn btn-info'),
+								elm$html$Html$Attributes$class('navbar-brand btn btn-info text-white'),
 								elm$html$Html$Events$onClick(author$project$Main$LogOut)
 							]),
 						_List_fromArray(
@@ -7709,19 +7709,28 @@ var author$project$Page$Home$tableBody = function (todos) {
 		function (todo) {
 			return A2(
 				elm$html$Html$tr,
-				_List_Nil,
+				_List_fromArray(
+					[
+						elm$html$Html$Attributes$class('d-flex')
+					]),
 				_List_fromArray(
 					[
 						A2(
 						elm$html$Html$td,
-						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('col-3')
+							]),
 						_List_fromArray(
 							[
 								elm$html$Html$text(todo.title)
 							])),
 						A2(
 						elm$html$Html$td,
-						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('col-5')
+							]),
 						_List_fromArray(
 							[
 								elm$html$Html$text(
@@ -7729,7 +7738,10 @@ var author$project$Page$Home$tableBody = function (todos) {
 							])),
 						A2(
 						elm$html$Html$td,
-						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('col-2')
+							]),
 						_List_fromArray(
 							[
 								elm$html$Html$text(
@@ -7737,7 +7749,10 @@ var author$project$Page$Home$tableBody = function (todos) {
 							])),
 						A2(
 						elm$html$Html$td,
-						_List_Nil,
+						_List_fromArray(
+							[
+								elm$html$Html$Attributes$class('col-2 justify-content-between d-flex align-items-center')
+							]),
 						_List_fromArray(
 							[
 								A2(
@@ -7820,7 +7835,6 @@ var elm$html$Html$table = _VirtualDom_node('table');
 var elm$html$Html$tbody = _VirtualDom_node('tbody');
 var elm$html$Html$th = _VirtualDom_node('th');
 var elm$html$Html$thead = _VirtualDom_node('thead');
-var elm$html$Html$Attributes$scope = elm$html$Html$Attributes$stringProperty('scope');
 var author$project$Page$Home$tableView = function (model) {
 	return A2(
 		elm$html$Html$div,
@@ -7848,19 +7862,25 @@ var author$project$Page$Home$tableView = function (model) {
 							[
 								A2(
 								elm$html$Html$thead,
-								_List_Nil,
+								_List_fromArray(
+									[
+										elm$html$Html$Attributes$class('thead-dark')
+									]),
 								_List_fromArray(
 									[
 										A2(
 										elm$html$Html$tr,
-										_List_Nil,
+										_List_fromArray(
+											[
+												elm$html$Html$Attributes$class('d-flex')
+											]),
 										_List_fromArray(
 											[
 												A2(
 												elm$html$Html$th,
 												_List_fromArray(
 													[
-														elm$html$Html$Attributes$scope('col')
+														elm$html$Html$Attributes$class('col-3 text-center')
 													]),
 												_List_fromArray(
 													[
@@ -7870,7 +7890,7 @@ var author$project$Page$Home$tableView = function (model) {
 												elm$html$Html$th,
 												_List_fromArray(
 													[
-														elm$html$Html$Attributes$scope('col')
+														elm$html$Html$Attributes$class('col-5 text-center')
 													]),
 												_List_fromArray(
 													[
@@ -7880,7 +7900,7 @@ var author$project$Page$Home$tableView = function (model) {
 												elm$html$Html$th,
 												_List_fromArray(
 													[
-														elm$html$Html$Attributes$scope('col')
+														elm$html$Html$Attributes$class('col-2 text-center')
 													]),
 												_List_fromArray(
 													[
@@ -7890,7 +7910,7 @@ var author$project$Page$Home$tableView = function (model) {
 												elm$html$Html$th,
 												_List_fromArray(
 													[
-														elm$html$Html$Attributes$scope('col')
+														elm$html$Html$Attributes$class('col-2 text-center')
 													]),
 												_List_fromArray(
 													[author$project$Page$Home$tableFilter]))
