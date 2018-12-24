@@ -217,10 +217,10 @@ navView model =
                     False
     in
     div
-        [ class "container"
+        [ class "container-fluid"
         , style "margin-bottom" "2rem"
         ]
-        [ nav [ class "navbar navbar-light bg-light" ]
+        [ nav [ class "navbar" ]
             [ a [ class "navbar-brand", href "/" ] [ text "Company Logo" ]
             , if isLoggedIn then
                 button [ class "navbar-brand btn btn-info text-white", onClick LogOut ] [ text "Log out" ]

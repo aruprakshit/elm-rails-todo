@@ -7456,7 +7456,7 @@ var author$project$Main$navView = function (model) {
 		elm$html$Html$div,
 		_List_fromArray(
 			[
-				elm$html$Html$Attributes$class('container'),
+				elm$html$Html$Attributes$class('container-fluid'),
 				A2(elm$html$Html$Attributes$style, 'margin-bottom', '2rem')
 			]),
 		_List_fromArray(
@@ -7465,7 +7465,7 @@ var author$project$Main$navView = function (model) {
 				elm$html$Html$nav,
 				_List_fromArray(
 					[
-						elm$html$Html$Attributes$class('navbar navbar-light bg-light')
+						elm$html$Html$Attributes$class('navbar')
 					]),
 				_List_fromArray(
 					[
