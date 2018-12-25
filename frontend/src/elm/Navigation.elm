@@ -14,6 +14,10 @@ type Route
     | Signup
 
 
+
+-- type UnAuthenticatedRoute = SignupRoute | SigninRoute
+
+
 route : Parser (Route -> a) a
 route =
     oneOf

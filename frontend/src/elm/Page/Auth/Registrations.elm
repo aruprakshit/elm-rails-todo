@@ -95,7 +95,7 @@ view model =
                             , class "form-control"
                             , id "sign-up-password-confirm"
                             , onInput (OnInputChange "passwordConfirmation")
-                            , value model.password
+                            , value model.passwordConfirmation
                             ]
                             []
                         ]

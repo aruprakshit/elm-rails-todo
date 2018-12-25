@@ -49,9 +49,9 @@ type State
     | Registrations Signup.Model
 
 
-initialModel : Nav.Key -> AuthState -> Model
-initialModel key authState =
-    Model key (Session Signin.initialModel) authState
+initialModel : Nav.Key -> AuthState -> State -> Model
+initialModel key authState state =
+    Model key state authState
 
 
 
@@ -144,6 +144,13 @@ update msg model =
             in
             ( { model | state = Session formData, authState = authState }, Cmd.map SessionsPageMsg cmd )
 
+        ( RegistrationsPageMsg formControlMsg, Registrations currentUser ) ->
+            let
+                ( formData, cmd, authState ) =
+                    RegistrationsPage.update model.key formControlMsg currentUser
+            in
+            ( { model | state = Registrations formData, authState = authState }, Cmd.map RegistrationsPageMsg cmd )
+
         ( ActivatedLink urlContainer, _ ) ->
             case urlContainer of
                 Internal url ->
@@ -200,12 +207,22 @@ init : JD.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
     case decodeFlags flags of
         Just authToken ->
-            getCurrentPageData (initialModel navKey (Authenticated authToken)) url
+            if url.path == "/sign-up" then
+                getCurrentPageData (initialModel navKey (Authenticated authToken) (Registrations Signup.initialModel)) url
+
+            else
+                getCurrentPageData (initialModel navKey (Authenticated authToken) (Session Signin.initialModel)) url
 
         Nothing ->
-            ( initialModel navKey NotAuthenticated
-            , Nav.pushUrl navKey (UB.absolute [ "sign-in" ] [])
-            )
+            if url.path == "/sign-up" then
+                ( initialModel navKey NotAuthenticated (Registrations Signup.initialModel)
+                , Nav.pushUrl navKey (UB.absolute [ "sign-up" ] [])
+                )
+
+            else
+                ( initialModel navKey NotAuthenticated (Session Signin.initialModel)
+                , Nav.pushUrl navKey (UB.absolute [ "sign-in" ] [])
+                )
 
 
 
