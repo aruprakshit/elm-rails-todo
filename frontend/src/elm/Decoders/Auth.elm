@@ -1,7 +1,10 @@
-module Decoders.Auth exposing (authDecoder)
+module Decoders.Auth exposing (AuthInfo, authDecoder)
 
-import Entities.Signin exposing (AuthInfo)
 import Json.Decode as JD
+
+
+type alias AuthInfo =
+    { authToken : String }
 
 
 authDecoder : JD.Decoder AuthInfo

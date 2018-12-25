@@ -1,9 +1,9 @@
-module Page.Auth.Sessions exposing (Model, Msg(..), update, view)
+module Page.Auth.Registrations exposing (Model, Msg(..), update, view)
 
 import Browser.Navigation as Nav
 import Config exposing (AuthState(..), backendDomain)
 import Decoders.Auth as AD exposing (authDecoder)
-import Entities.Signin as Signin
+import Entities.Signup as Signup
 import Html exposing (Html, a, button, div, form, input, label, text)
 import Html.Attributes exposing (class, for, href, id, style, type_, value)
 import Html.Events exposing (onInput, onSubmit)
@@ -15,12 +15,12 @@ import Url.Builder as UB
 
 type Msg
     = OnInputChange String String
-    | LogInRequested
-    | LoginCompleted (Result Http.Error AD.AuthInfo)
+    | SignupRequested
+    | SignupCompleted (Result Http.Error AD.AuthInfo)
 
 
 type alias Model =
-    Signin.Model
+    Signup.Model
 
 
 update : Nav.Key -> Msg -> Model -> ( Model, Cmd Msg, AuthState )
@@ -32,13 +32,16 @@ update key msg model =
         OnInputChange "password" value ->
             ( { model | password = value }, Cmd.none, NotAuthenticated )
 
+        OnInputChange "passwordConfirmation" value ->
+            ( { model | passwordConfirmation = value }, Cmd.none, NotAuthenticated )
+
         OnInputChange _ _ ->
             ( model, Cmd.none, NotAuthenticated )
 
-        LogInRequested ->
-            ( model, singIn model, NotAuthenticated )
+        SignupRequested ->
+            ( model, singUp model, NotAuthenticated )
 
-        LoginCompleted response ->
+        SignupCompleted response ->
             case response of
                 Ok authData ->
                     ( model
@@ -57,14 +60,14 @@ view : Model -> Html Msg
 view model =
     div [ class "row", style "height" "100vh" ]
         [ div [ class "col-6 m-auto" ]
-            [ form [ onSubmit LogInRequested ]
+            [ form [ onSubmit SignupRequested ]
                 [ div [ class "form-group" ]
                     [ div [ class "col-8" ]
-                        [ label [ for "sign-in-email" ] [ text "Email address" ]
+                        [ label [ for "sign-up-email" ] [ text "Email address" ]
                         , input
                             [ type_ "email"
                             , class "form-control"
-                            , id "sign-in-email"
+                            , id "sign-up-email"
                             , onInput (OnInputChange "email")
                             , value model.email
                             ]
@@ -73,11 +76,11 @@ view model =
                     ]
                 , div [ class "form-group" ]
                     [ div [ class "col-8" ]
-                        [ label [ for "sign-in-password" ] [ text "Password" ]
+                        [ label [ for "sign-up-password" ] [ text "Password" ]
                         , input
                             [ type_ "password"
                             , class "form-control"
-                            , id "sign-in-password"
+                            , id "sign-up-password"
                             , onInput (OnInputChange "password")
                             , value model.password
                             ]
@@ -85,8 +88,21 @@ view model =
                         ]
                     ]
                 , div [ class "form-group" ]
+                    [ div [ class "col-8" ]
+                        [ label [ for "sign-up-password-confirm" ] [ text "Password" ]
+                        , input
+                            [ type_ "password"
+                            , class "form-control"
+                            , id "sign-up-password-confirm"
+                            , onInput (OnInputChange "passwordConfirmation")
+                            , value model.password
+                            ]
+                            []
+                        ]
+                    ]
+                , div [ class "form-group" ]
                     [ div [ class "col-4" ]
-                        [ button [ type_ "submit", class "btn btn-primary" ] [ text "Log In" ]
+                        [ button [ type_ "submit", class "btn btn-primary" ] [ text "Sign Up" ]
                         ]
                     ]
                 ]
@@ -94,18 +110,19 @@ view model =
         ]
 
 
-singIn : Model -> Cmd Msg
-singIn formData =
+singUp : Model -> Cmd Msg
+singUp formData =
     Http.post
-        { url = backendDomain ++ UB.absolute [ "sessions" ] []
-        , body = Http.jsonBody <| loginPayload formData
-        , expect = Http.expectJson LoginCompleted authDecoder
+        { url = backendDomain ++ UB.absolute [ "registrations" ] []
+        , body = Http.jsonBody <| singupPayload formData
+        , expect = Http.expectJson SignupCompleted authDecoder
         }
 
 
-loginPayload : Model -> JE.Value
-loginPayload formData =
+singupPayload : Model -> JE.Value
+singupPayload formData =
     JE.object
         [ ( "email", JE.string formData.email )
         , ( "password", JE.string formData.password )
+        , ( "password_confirmation", JE.string formData.passwordConfirmation )
         ]

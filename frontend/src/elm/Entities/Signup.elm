@@ -1,12 +1,13 @@
-module Entities.Signin exposing (Model, initialModel)
+module Entities.Signup exposing (Model, initialModel)
 
 
 type alias Model =
     { email : String
     , password : String
+    , passwordConfirmation : String
     }
 
 
 initialModel : Model
 initialModel =
-    Model "" ""
+    Model "" "" ""

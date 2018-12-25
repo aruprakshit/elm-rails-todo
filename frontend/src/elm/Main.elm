@@ -6,6 +6,7 @@ import Config exposing (AuthState(..), backendDomain)
 import Decoders.Flags exposing (decodeFlags)
 import Decoders.Todos exposing (todoDecoder, todosListDecoder)
 import Entities.Signin as Signin
+import Entities.Signup as Signup
 import Entities.Todo as Todo
 import Html exposing (Html, a, button, div, h1, nav, text)
 import Html.Attributes exposing (class, href, style)
@@ -14,6 +15,7 @@ import Http
 import Json.Decode as JD
 import Json.Encode as JE
 import Navigation exposing (Route(..), toRoute)
+import Page.Auth.Registrations as RegistrationsPage
 import Page.Auth.Sessions as SessionsPage
 import Page.Home as HomePage
 import Page.NotFound as PageNotFound
@@ -44,6 +46,7 @@ type State
     | ShowTodo (Maybe Todo.Model)
     | NoPageFound
     | Session Signin.Model
+    | Registrations Signup.Model
 
 
 initialModel : Nav.Key -> AuthState -> Model
@@ -64,6 +67,7 @@ type Msg
     | HomePageMsg HomePage.Msg
     | EditTodoPageMsg EditTodoPage.Msg
     | SessionsPageMsg SessionsPage.Msg
+    | RegistrationsPageMsg RegistrationsPage.Msg
     | LogOut
 
 
@@ -100,6 +104,9 @@ getCurrentPageData model url =
             )
 
         Login ->
+            ( model, Cmd.none )
+
+        Signup ->
             ( model, Cmd.none )
 
         NotFound ->
@@ -268,6 +275,9 @@ pageTitle model =
         Session _ ->
             "Log in"
 
+        Registrations _ ->
+            "Sign up"
+
         NoPageFound ->
             "Page not found"
 
@@ -300,6 +310,12 @@ pageBody { key, state } =
                 Session user ->
                     (SessionsPage.view user
                         |> Html.map SessionsPageMsg
+                    )
+                        :: []
+
+                Registrations user ->
+                    (RegistrationsPage.view user
+                        |> Html.map RegistrationsPageMsg
                     )
                         :: []
 
