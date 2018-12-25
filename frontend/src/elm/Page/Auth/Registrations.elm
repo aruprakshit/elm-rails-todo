@@ -119,10 +119,17 @@ singUp formData =
         }
 
 
-singupPayload : Model -> JE.Value
-singupPayload formData =
+formPayload : Model -> JE.Value
+formPayload formData =
     JE.object
         [ ( "email", JE.string formData.email )
         , ( "password", JE.string formData.password )
         , ( "password_confirmation", JE.string formData.passwordConfirmation )
+        ]
+
+
+singupPayload : Model -> JE.Value
+singupPayload formData =
+    JE.object
+        [ ( "signup", formPayload formData )
         ]

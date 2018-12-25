@@ -1,8 +1,8 @@
 class RegistrationsController < ApplicationController
   skip_before_action :authenticate_request
-  
+
   def create
-    service = CreateUser(signup_params)
+    service = CreateUser.new(signup_params).call
 
     if service.has_error?
       render json: { error: service.errors.body }, status: service.errors.code

@@ -10,7 +10,7 @@ class CreateUser
   end
 
   def call
-    user = User.new(attrs)
+    user = User.new(@attrs)
     if user.valid?
       user.save
     else
@@ -34,6 +34,8 @@ class CreateUser
         code: :unprocessable_entity
       }
     end
+
+    self
   rescue BadCredentials, AuthenticationFailed => e
     @errors = e.message
   end
