@@ -207,11 +207,7 @@ init : JD.Value -> Url -> Nav.Key -> ( Model, Cmd Msg )
 init flags url navKey =
     case decodeFlags flags of
         Just authToken ->
-            if url.path == "/sign-up" then
-                getCurrentPageData (initialModel navKey (Authenticated authToken) (Registrations Signup.initialModel)) url
-
-            else
-                getCurrentPageData (initialModel navKey (Authenticated authToken) (Session Signin.initialModel)) url
+            getCurrentPageData (initialModel navKey (Authenticated authToken) (Home [])) url
 
         Nothing ->
             if url.path == "/sign-up" then
