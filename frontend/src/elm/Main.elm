@@ -104,10 +104,14 @@ getCurrentPageData model url =
             )
 
         UnAuthed Signin ->
-            ( model, Cmd.none )
+            ( { model | state = Session Signin.initialModel }
+            , Cmd.none
+            )
 
         UnAuthed Signup ->
-            ( model, Cmd.none )
+            ( { model | state = Registrations Signup.initialModel }
+            , Cmd.none
+            )
 
         NotFound ->
             ( { model | state = NoPageFound }
@@ -211,21 +215,21 @@ init flags url navKey =
 
         Nothing ->
             let
-                redirectUrl =
+                ( redirectUrl, model ) =
                     case toRoute <| Url.toString url of
                         Authed _ ->
-                            UB.absolute [ "sign-up" ] []
+                            ( UB.absolute [ "sign-up" ] [], Registrations Signup.initialModel )
 
                         UnAuthed Signin ->
-                            UB.absolute [ "sign-in" ] []
+                            ( UB.absolute [ "sign-in" ] [], Session Signin.initialModel )
 
                         UnAuthed Signup ->
-                            UB.absolute [ "sign-up" ] []
+                            ( UB.absolute [ "sign-up" ] [], Registrations Signup.initialModel )
 
                         NotFound ->
-                            UB.absolute [ "not-found" ] []
+                            ( UB.absolute [ "not-found" ] [], NoPageFound )
             in
-            ( initialModel navKey NotAuthenticated (Session Signin.initialModel)
+            ( initialModel navKey NotAuthenticated model
             , Nav.pushUrl navKey redirectUrl
             )
 
@@ -246,25 +250,27 @@ subscriptions _ =
 navView : Model -> Html Msg
 navView model =
     let
-        isLoggedIn =
-            case model.authState of
-                Authenticated _ ->
-                    True
+        actions =
+            case ( model.authState, model.state ) of
+                ( Authenticated _, _ ) ->
+                    button [ class "btn btn-info text-white", onClick LogOut ] [ text "Log out" ]
 
-                NotAuthenticated ->
-                    False
+                ( NotAuthenticated, Registrations _ ) ->
+                    a [ class "btn btn-primary", href (UB.absolute [ "sign-in" ] []) ] [ text "Log In" ]
+
+                ( NotAuthenticated, Session _ ) ->
+                    a [ class "btn btn-primary", href (UB.absolute [ "sign-up" ] []) ] [ text "Sign Up" ]
+
+                ( NotAuthenticated, _ ) ->
+                    text ""
     in
     div
         [ class "container-fluid"
         , style "margin-bottom" "2rem"
         ]
-        [ nav [ class "navbar" ]
+        [ nav [ class "navbar bg-light" ]
             [ a [ class "navbar-brand", href "/" ] [ text "Company Logo" ]
-            , if isLoggedIn then
-                button [ class "navbar-brand btn btn-info text-white", onClick LogOut ] [ text "Log out" ]
-
-              else
-                text ""
+            , actions
             ]
         ]
 
