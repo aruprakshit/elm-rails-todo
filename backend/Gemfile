@@ -23,7 +23,7 @@ gem 'fast_jsonapi'
 # Use ActiveStorage variant
 gem 'mini_magick', '~> 4.8'
 gem 'image_processing', '~> 1.2'
-
+gem 'friendly_id', '~> 5.2.4'
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
