@@ -210,15 +210,24 @@ init flags url navKey =
             getCurrentPageData (initialModel navKey (Authenticated authToken) (Home [])) url
 
         Nothing ->
-            if url.path == "/sign-up" then
-                ( initialModel navKey NotAuthenticated (Registrations Signup.initialModel)
-                , Nav.pushUrl navKey (UB.absolute [ "sign-up" ] [])
-                )
+            let
+                redirectUrl =
+                    case toRoute <| Url.toString url of
+                        Authed _ ->
+                            UB.absolute [ "sign-up" ] []
 
-            else
-                ( initialModel navKey NotAuthenticated (Session Signin.initialModel)
-                , Nav.pushUrl navKey (UB.absolute [ "sign-in" ] [])
-                )
+                        UnAuthed Signin ->
+                            UB.absolute [ "sign-in" ] []
+
+                        UnAuthed Signup ->
+                            UB.absolute [ "sign-up" ] []
+
+                        NotFound ->
+                            UB.absolute [ "not-found" ] []
+            in
+            ( initialModel navKey NotAuthenticated (Session Signin.initialModel)
+            , Nav.pushUrl navKey redirectUrl
+            )
 
 
 
