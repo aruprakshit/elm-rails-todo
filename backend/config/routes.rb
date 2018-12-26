@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   resources :registrations, only: [:create]
   resources :sessions, only: [:create]
-
+  resource :profile, only: [:show, :update]
   resources :todos do
     collection do
       post :search
