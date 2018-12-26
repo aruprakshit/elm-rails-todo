@@ -1,32 +1,43 @@
-module Navigation exposing (Route(..), toRoute)
+module Navigation exposing (AuthenticatedRoute(..), Route(..), UnAuthenticatedRoute(..), toRoute)
 
 import Url exposing (Url)
 import Url.Parser exposing (..)
 
 
-type Route
+type UnAuthenticatedRoute
+    = Signup
+    | Signin
+
+
+type AuthenticatedRoute
     = New
     | Edit Int
     | Index
     | Show Int
+
+
+type Route
+    = UnAuthed UnAuthenticatedRoute
+    | Authed AuthenticatedRoute
     | NotFound
-    | Login
-    | Signup
-
-
-
--- type UnAuthenticatedRoute = SignupRoute | SigninRoute
 
 
 route : Parser (Route -> a) a
 route =
+    let
+        toEditRoute todoId =
+            Authed (Edit todoId)
+
+        toShowRoute todoId =
+            Authed (Show todoId)
+    in
     oneOf
-        [ map Index top
-        , map New (s "todos" </> s "new")
-        , map Edit (s "todos" </> int </> s "edit")
-        , map Show (s "todos" </> int)
-        , map Login (s "sign-in")
-        , map Signup (s "sign-up")
+        [ map (Authed Index) top
+        , map (Authed New) (s "todos" </> s "new")
+        , map toEditRoute (s "todos" </> int </> s "edit")
+        , map toShowRoute (s "todos" </> int)
+        , map (UnAuthed Signin) (s "sign-in")
+        , map (UnAuthed Signup) (s "sign-up")
         ]
 
 

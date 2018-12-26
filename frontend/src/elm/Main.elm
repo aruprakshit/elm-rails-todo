@@ -14,7 +14,7 @@ import Html.Events exposing (onClick)
 import Http
 import Json.Decode as JD
 import Json.Encode as JE
-import Navigation exposing (Route(..), toRoute)
+import Navigation exposing (AuthenticatedRoute(..), Route(..), UnAuthenticatedRoute(..), toRoute)
 import Page.Auth.Registrations as RegistrationsPage
 import Page.Auth.Sessions as SessionsPage
 import Page.Home as HomePage
@@ -74,7 +74,7 @@ type Msg
 getCurrentPageData : Model -> Url -> ( Model, Cmd Msg )
 getCurrentPageData model url =
     case toRoute <| Url.toString url of
-        Index ->
+        Authed Index ->
             case model.authState of
                 Authenticated authToken ->
                     ( { model | state = Home [] }
@@ -88,25 +88,25 @@ getCurrentPageData model url =
                     , Nav.pushUrl model.key (UB.absolute [ "sign-in" ] [])
                     )
 
-        New ->
+        Authed New ->
             ( { model | state = NewTodo Todo.initialModel }
             , Cmd.none
             )
 
-        Show todoId ->
+        Authed (Show todoId) ->
             ( { model | state = ShowTodo Nothing }
             , fetchTodo model todoId
             )
 
-        Edit todoId ->
+        Authed (Edit todoId) ->
             ( { model | state = EditTodo Nothing }
             , fetchTodo model todoId
             )
 
-        Login ->
+        UnAuthed Signin ->
             ( model, Cmd.none )
 
-        Signup ->
+        UnAuthed Signup ->
             ( model, Cmd.none )
 
         NotFound ->
